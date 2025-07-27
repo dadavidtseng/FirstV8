@@ -39,31 +39,51 @@ STATIC bool App::m_isQuitting = false;
 //----------------------------------------------------------------------------------------------------
 void App::Startup()
 {
-    // Create All Engine Subsystems
-    sEventSystemConfig eventSystemConfig;
-    g_theEventSystem = new EventSystem(eventSystemConfig);
+    //-Start-of-EventSystem---------------------------------------------------------------------------
+
+    sEventSystemConfig constexpr sEventSystemConfig;
+    g_theEventSystem = new EventSystem(sEventSystemConfig);
     g_theEventSystem->SubscribeEventCallbackFunction("OnCloseButtonClicked", OnCloseButtonClicked);
     g_theEventSystem->SubscribeEventCallbackFunction("quit", OnCloseButtonClicked);
 
-    sInputSystemConfig inputConfig;
-    g_theInput = new InputSystem(inputConfig);
+    //-End-of-EventSystem-----------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
+    //-Start-of-InputSystem---------------------------------------------------------------------------
 
-    sWindowConfig windowConfig;
-    windowConfig.m_windowType = eWindowType::WINDOWED;
-    windowConfig.m_aspectRatio = 2.f;
-    windowConfig.m_inputSystem = g_theInput;
-    windowConfig.m_windowTitle = "Protogame3D";
-    g_theWindow                = new Window(windowConfig);
+    sInputSystemConfig constexpr sInputSystemConfig;
+    g_theInput = new InputSystem(sInputSystemConfig);
 
-    sRendererConfig rendererConfig;
-    rendererConfig.m_window = g_theWindow;
-    g_theRenderer           = new Renderer(rendererConfig);
+    //-End-of-InputSystem-----------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
+    //-Start-of-Window--------------------------------------------------------------------------------
 
-    sDebugRenderConfig debugConfig;
-    debugConfig.m_renderer = g_theRenderer;
-    debugConfig.m_fontName = "SquirrelFixedFont";
+    sWindowConfig sWindowConfig;
+    sWindowConfig.m_windowType  = eWindowType::WINDOWED;
+    sWindowConfig.m_aspectRatio = 2.f;
+    sWindowConfig.m_inputSystem = g_theInput;
+    sWindowConfig.m_windowTitle = "FirstV8";
+    g_theWindow                = new Window(sWindowConfig);
 
-    // Initialize devConsoleCamera
+    //-End-of-Window----------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
+    //-Start-of-Renderer------------------------------------------------------------------------------
+
+    sRendererConfig sRendererConfig;
+    sRendererConfig.m_window = g_theWindow;
+    g_theRenderer           = new Renderer(sRendererConfig);
+
+    //-End-of-Renderer--------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
+    //-Start-of-DebugRender---------------------------------------------------------------------------
+
+    sDebugRenderConfig sDebugRenderConfig;
+    sDebugRenderConfig.m_renderer = g_theRenderer;
+    sDebugRenderConfig.m_fontName = "SquirrelFixedFont";
+
+    //-End-of-DebugRender-----------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
+    //-Start-of-DevConsole----------------------------------------------------------------------------
+
     m_devConsoleCamera = new Camera();
 
     sDevConsoleConfig devConsoleConfig;
@@ -91,8 +111,12 @@ void App::Startup()
     g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(ESC)   Exit Game");
     g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(SPACE) Start Game");
 
-    sAudioSystemConfig audioConfig;
-    g_theAudio = new AudioSystem(audioConfig);
+    //-End-of-DevConsole------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
+    //-Start-of-AudioSystem---------------------------------------------------------------------------
+
+    sAudioSystemConfig constexpr  sAudioSystemConfig;
+    g_theAudio = new AudioSystem(sAudioSystemConfig);
 
     sLightConfig constexpr lightConfig;
     g_theLightSubsystem = new LightSubsystem(lightConfig);
@@ -110,34 +134,29 @@ void App::Startup()
     //------------------------------------------------------------------------------------------------
     //-Start-of-V8Subsystem--------------------------------------------------------------------------
 
-    // V8 子系統（整合版，包含原 JavaScriptManager 功能）
     sV8SubsystemConfig v8Config;
-    v8Config.enableDebugging = true;
-    v8Config.heapSizeLimit = 256; // MB
+    v8Config.enableDebugging    = true;
+    v8Config.heapSizeLimit      = 256;
     v8Config.enableGameBindings = true;
-    g_theV8Subsystem = new V8Subsystem(v8Config);
+    g_theV8Subsystem            = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem----------------------------------------------------------------------------
-
 
     g_theEventSystem->Startup();
     g_theWindow->Startup();
     g_theRenderer->Startup();
-    DebugRenderSystemStartup(debugConfig);
+    DebugRenderSystemStartup(sDebugRenderConfig);
     g_theDevConsole->StartUp();
     g_theInput->Startup();
     g_theAudio->Startup();
     g_theLightSubsystem->StartUp();
     g_theResourceSubsystem->Startup();
-    g_theV8Subsystem->Startup();  // V8 ?????
+    g_theV8Subsystem->Startup();
 
     g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
     g_theRNG        = new RandomNumberGenerator();
     g_theGame       = new Game();
     BindGameToJavaScript();
-    // // 建立全域 JavaScript 管理器
-    // g_theJavaScriptManager = new JavaScriptManager();
-    // g_theJavaScriptManager->Initialize();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -146,50 +165,28 @@ void App::Startup()
 void App::Shutdown()
 {
     // Destroy all Engine Subsystem
-    delete g_theGame;
-    g_theGame = nullptr;
+    GAME_SAFE_RELEASE(g_theGame);
+    GAME_SAFE_RELEASE(g_theRNG);
+    GAME_SAFE_RELEASE(g_theBitmapFont);
 
-    // // 清理全域 JavaScript 管理器
-    // if (g_theJavaScriptManager)
-    // {
-    //     delete g_theJavaScriptManager;
-    //     g_theJavaScriptManager = nullptr;
-    // }
-
-    delete g_theRNG;
-    g_theRNG = nullptr;
-
-    delete g_theBitmapFont;
-    g_theBitmapFont = nullptr;
-
-    g_theV8Subsystem->Shutdown();  // V8 ????
+    g_theV8Subsystem->Shutdown();
     g_theLightSubsystem->ShutDown();
     g_theAudio->Shutdown();
     g_theInput->Shutdown();
     g_theDevConsole->Shutdown();
 
-    delete m_devConsoleCamera;
-    m_devConsoleCamera = nullptr;
+    GAME_SAFE_RELEASE(m_devConsoleCamera);
 
     DebugRenderSystemShutdown();
     g_theRenderer->Shutdown();
     g_theWindow->Shutdown();
     g_theEventSystem->Shutdown();
 
-    delete g_theV8Subsystem;
-    g_theV8Subsystem = nullptr;
-
-    delete g_theAudio;
-    g_theAudio = nullptr;
-
-    delete g_theRenderer;
-    g_theRenderer = nullptr;
-
-    delete g_theWindow;
-    g_theWindow = nullptr;
-
-    delete g_theInput;
-    g_theInput = nullptr;
+    GAME_SAFE_RELEASE(g_theV8Subsystem);
+    GAME_SAFE_RELEASE(g_theAudio);
+    GAME_SAFE_RELEASE(g_theRenderer);
+    GAME_SAFE_RELEASE(g_theWindow);
+    GAME_SAFE_RELEASE(g_theInput);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -247,10 +244,9 @@ void App::BeginFrame() const
 void App::Update()
 {
     Clock::TickSystemClock();
-	float deltaSeconds = Clock::GetSystemClock().GetDeltaSeconds();
+    float deltaSeconds = Clock::GetSystemClock().GetDeltaSeconds();
     UpdateCursorMode();
     g_theGame->Update();
-   
 }
 
 //----------------------------------------------------------------------------------------------------

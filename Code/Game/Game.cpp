@@ -60,7 +60,6 @@ Game::Game()
     DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f, Rgba8::BLUE);
 
 
-
     // // 執行一些測試腳本
     // RunJavaScriptTests();
 }
@@ -114,7 +113,7 @@ void Game::Startup()
 
     // 建立相機
     m_screenCamera = new Camera();
-    m_worldCamera = new Camera();
+    m_worldCamera  = new Camera();
 
     // 生成遊戲實體
     SpawnPlayer();
@@ -139,7 +138,7 @@ void Game::Shutdown()
 void Game::Update()
 {
     // 原本的更新邏輯
-    float const gameDeltaSeconds = static_cast<float>(m_gameClock->GetDeltaSeconds());
+    float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
     float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
 
     UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
@@ -332,8 +331,6 @@ void Game::UpdateFromKeyBoard()
 
         DebugAddMessage(Stringf("Player Position: (%.2f, %.2f, %.2f)", m_player->m_position.x, m_player->m_position.y, m_player->m_position.z), 0.f);
     }
-
-
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -478,7 +475,6 @@ void Game::SpawnProp()
 }
 
 
-
 //----------------------------------------------------------------------------------------------------
 // 新增的 JavaScript 相關方法
 //----------------------------------------------------------------------------------------------------
@@ -562,14 +558,14 @@ void Game::HandleJavaScriptCommands()
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::CreateCube(const Vec3& position)
+void Game::CreateCube(Vec3 const& position)
 {
     DebuggerPrintf("JavaScript 請求建立方塊在位置 (%.2f, %.2f, %.2f)\n", position.x, position.y, position.z);
 
     // 建立新的方塊物件
-    Prop* newCube = new Prop(this);
+    Prop* newCube       = new Prop(this);
     newCube->m_position = position;
-    newCube->m_color = Rgba8(
+    newCube->m_color    = Rgba8(
         static_cast<unsigned char>(g_theRNG->RollRandomIntInRange(100, 255)),
         static_cast<unsigned char>(g_theRNG->RollRandomIntInRange(100, 255)),
         static_cast<unsigned char>(g_theRNG->RollRandomIntInRange(100, 255)),
@@ -584,7 +580,7 @@ void Game::CreateCube(const Vec3& position)
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::MoveProp(int propIndex, const Vec3& newPosition)
+void Game::MoveProp(int propIndex, Vec3 const& newPosition)
 {
     if (propIndex >= 0 && propIndex < static_cast<int>(m_props.size()))
     {

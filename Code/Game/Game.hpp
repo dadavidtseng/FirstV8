@@ -44,8 +44,8 @@ public:
     void HandleJavaScriptCommands();
 
     // 新增：JavaScript 回呼函數需要的遊戲功能
-    void CreateCube(const Vec3& position);
-    void MoveProp(int propIndex, const Vec3& newPosition);
+    void    CreateCube(const Vec3& position);
+    void    MoveProp(int propIndex, const Vec3& newPosition);
     Player* GetPlayer();
 
     // 新增：控制台命令處理
@@ -82,5 +82,5 @@ private:
 
     // 新增：JavaScript 狀態
     bool m_hasInitializedJS = false;
-    bool m_hasRunJSTests = false;
+    bool m_hasRunJSTests    = false;
 };
