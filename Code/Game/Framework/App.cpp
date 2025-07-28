@@ -137,7 +137,6 @@ void App::Startup()
     sV8SubsystemConfig v8Config;
     v8Config.enableDebugging    = true;
     v8Config.heapSizeLimit      = 256;
-    v8Config.enableGameBindings = true;
     g_theV8Subsystem            = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem----------------------------------------------------------------------------
@@ -156,7 +155,7 @@ void App::Startup()
     g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
     g_theRNG        = new RandomNumberGenerator();
     g_theGame       = new Game();
-    BindGameToJavaScript();
+    SetupScriptingBindings();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -164,6 +163,16 @@ void App::Startup()
 //
 void App::Shutdown()
 {
+    // 在其他清理程式碼之前新增：
+    if (m_gameScriptInterface)
+    {
+        if (g_theV8Subsystem)
+        {
+            g_theV8Subsystem->UnregisterScriptableObject("game");
+        }
+        m_gameScriptInterface.reset();
+    }
+
     // Destroy all Engine Subsystem
     GAME_SAFE_RELEASE(g_theGame);
     GAME_SAFE_RELEASE(g_theRNG);
@@ -306,17 +315,71 @@ void App::DeleteAndCreateNewGame()
     g_theGame = new Game();
 }
 
-//----------------------------------------------------------------------------------------------------
-void App::BindGameToJavaScript()
+void App::SetupScriptingBindings()
 {
     if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized() && g_theGame)
     {
-        DebuggerPrintf("綁定遊戲物件到 JavaScript...\n");
-        g_theV8Subsystem->BindGameObjects(g_theGame);
-        DebuggerPrintf("JavaScript 綁定完成！\n");
+        DebuggerPrintf("設定腳本綁定...\n");
+
+        // 創建 Game 的腳本介面
+        m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_theGame);
+        g_theV8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
+
+        // 註冊一些實用的全域函式
+        g_theV8Subsystem->RegisterGlobalFunction("print", [](const std::vector<std::any>& args) -> std::any {
+            if (!args.empty())
+            {
+                try
+                {
+                    std::string message = std::any_cast<std::string>(args[0]);
+                    DebuggerPrintf("JS: %s\n", message.c_str());
+
+                    // 如果有 DevConsole，也可以輸出到那裡
+                    if (g_theDevConsole)
+                    {
+                        g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "JS: " + message);
+                    }
+                }
+                catch (const std::bad_any_cast&)
+                {
+                    DebuggerPrintf("JS: [無法轉換的物件]\n");
+                }
+            }
+            return std::any{};
+        });
+
+        // 註冊除錯函式
+        g_theV8Subsystem->RegisterGlobalFunction("debug", [](const std::vector<std::any>& args) -> std::any {
+            if (!args.empty())
+            {
+                try
+                {
+                    std::string message = std::any_cast<std::string>(args[0]);
+                    DebuggerPrintf("JS DEBUG: %s\n", message.c_str());
+                }
+                catch (const std::bad_any_cast&)
+                {
+                    DebuggerPrintf("JS DEBUG: [無法轉換的物件]\n");
+                }
+            }
+            return std::any{};
+        });
+
+        // 註冊清理記憶體函式
+        g_theV8Subsystem->RegisterGlobalFunction("gc", [](const std::vector<std::any>& args) -> std::any {
+            UNUSED(args);
+            if (g_theV8Subsystem)
+            {
+                g_theV8Subsystem->ForceGarbageCollection();
+                DebuggerPrintf("JS: 垃圾回收已執行\n");
+            }
+            return std::any{};
+        });
+
+        DebuggerPrintf("腳本綁定設定完成！\n");
     }
     else
     {
-        DebuggerPrintf("警告：無法綁定遊戲物件到 JavaScript（V8Subsystem 或 Game 無效）\n");
+        DebuggerPrintf("警告：無法設定腳本綁定\n");
     }
 }

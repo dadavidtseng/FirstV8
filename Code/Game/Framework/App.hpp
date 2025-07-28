@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #pragma once
 #include "Engine/Core/EventSystem.hpp"
+#include "Game/Framework/GameScriptInterface.hpp"
 
 //-Forward-Declaration--------------------------------------------------------------------------------
 class Camera;
@@ -33,7 +34,8 @@ private:
 
     void UpdateCursorMode();
     void DeleteAndCreateNewGame();
-    void BindGameToJavaScript();
+    void SetupScriptingBindings();
 
-    Camera* m_devConsoleCamera = nullptr;
+    Camera*                              m_devConsoleCamera = nullptr;
+    std::shared_ptr<GameScriptInterface> m_gameScriptInterface;
 };

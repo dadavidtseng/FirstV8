@@ -547,13 +547,13 @@ void Game::HandleJavaScriptCommands()
 
     if (g_theInput->WasKeyJustPressed('K'))
     {
-        ExecuteJavaScriptCommand("Game.createCube(Math.random() * 10 - 5, 0, Math.random() * 10 - 5);");
+        ExecuteJavaScriptCommand("game.createCube(Math.random() * 10 - 5, 0, Math.random() * 10 - 5);");
         // CreateCube(Vec3::ZERO);
     }
 
     if (g_theInput->WasKeyJustPressed('L'))
     {
-        ExecuteJavaScriptCommand("var pos = Game.getPlayerPos(); console.log('玩家位置:', pos);");
+        ExecuteJavaScriptCommand("var pos = game.getPlayerPos(); console.log('玩家位置:', pos);");
     }
 }
 
@@ -639,21 +639,21 @@ void Game::RunJavaScriptTests()
     ExecuteJavaScriptCommand("var result = 10 + 5 * 2; console.log('數學測試: 10 + 5 * 2 =', result);");
 
     // 遊戲物件互動測試
-    ExecuteJavaScriptCommand("console.log('取得玩家位置:', Game.getPlayerPos());");
+    ExecuteJavaScriptCommand("console.log('取得玩家位置:', game.getPlayerPos());");
 
     // 建立物件測試
-    ExecuteJavaScriptCommand("Game.createCube(3, 0, 3); console.log('已建立測試方塊');");
+    ExecuteJavaScriptCommand("game.createCube(3, 0, 3); console.log('已建立測試方塊');");
 
     // 移動物件測試（移動第一個物件）
     if (!m_props.empty())
     {
-        ExecuteJavaScriptCommand("Game.moveProp(0, 2, 1, 2); console.log('已移動第一個物件');");
+        ExecuteJavaScriptCommand("game.moveProp(0, 2, 1, 2); console.log('已移動第一個物件');");
     }
 
     // 複雜腳本測試
     ExecuteJavaScriptCommand(R"(
         for(var i = 0; i < 3; i++) {
-            Game.createCube(i * 2, 0, 5);
+            game.createCube(i * 2, 0, 5);
             console.log('建立方塊', i + 1);
         }
         console.log('=== JavaScript 功能測試完成 ===');

@@ -34,15 +34,15 @@ function gameObjectTests() {
     console.log("=== Game Object Tests ===");
 
     // Get player position
-    var playerPos = Game.getPlayerPos();
+    var playerPos = game.getPlayerPosition();
     console.log("Current player position: x=" + playerPos.x + ", y=" + playerPos.y + ", z=" + playerPos.z);
 
     // Create a cube
-    Game.createCube(0, 0, 5);
+    game.createCube(0, 0, 5);
     console.log("Created cube at (0, 0, 5)");
 
     // Move prop
-    Game.moveProp(0, 3, 3, 1);
+    game.moveProp(0, 3, 3, 1);
     console.log("Moved prop 0 to position (3, 3, 1)");
 }
 
@@ -60,7 +60,7 @@ function patternTests() {
             var y = Math.sin(angle) * radius;
             var z = 0;
 
-            Game.createCube(x, y, z);
+            game.createCube(x, y, z);
         }
     }
 
@@ -70,7 +70,7 @@ function patternTests() {
 
         for (var x = 0; x < size; x++) {
             for (var y = 0; y < size; y++) {
-                Game.createCube(x * spacing, y * spacing, 0);
+                game.createCube(x * spacing, y * spacing, 0);
             }
         }
     }
@@ -90,7 +90,7 @@ function patternTests() {
             var y = Math.sin(angle) * currentRadius;
             var z = t * 5; // Increase height along spiral
 
-            Game.createCube(x, y, z);
+            game.createCube(x, y, z);
         }
     }
 
@@ -116,7 +116,7 @@ function animationTests() {
             var y = Math.sin(time + i * 0.5) * 3; // Swinging
             var z = 2;
 
-            Game.createCube(x, y, z);
+            game.createCube(x, y, z);
         }
     }
 
@@ -129,7 +129,7 @@ function animationTests() {
                 var distance = Math.sqrt(x * x + y * y);
                 var height = Math.sin(distance - time * 2) * 2 + 3;
 
-                Game.createCube(x, y, height);
+                game.createCube(x, y, height);
             }
         }
     }
@@ -171,7 +171,7 @@ function mathUtils() {
             var y = (Math.random() - 0.5) * 2 * range;
             var z = Math.random() * range;
 
-            Game.createCube(x, y, z);
+            game.createCube(x, y, z);
             console.log("Random cube " + i + ": (" + x.toFixed(2) + ", " + y.toFixed(2) + ", " + z.toFixed(2) + ")");
         }
     }
@@ -214,7 +214,7 @@ function gameLogicTests() {
         };
 
         gameState.enemies.push(enemy);
-        Game.createCube(x, y, z);
+        game.createCube(x, y, z);
         console.log("Spawned enemy " + enemy.id + " at position (" + x + ", " + y + ", " + z + ")");
 
         return enemy;
@@ -229,7 +229,7 @@ function gameLogicTests() {
             enemy.x += (Math.random() - 0.5) * 2;
             enemy.y += (Math.random() - 0.5) * 2;
 
-            Game.moveProp(i, enemy.x, enemy.y, enemy.z);
+            game.moveProp(i, enemy.x, enemy.y, enemy.z);
             console.log("Enemy " + enemy.id + " moved to (" + enemy.x.toFixed(2) + ", " + enemy.y.toFixed(2) + ", " + enemy.z + ")");
         }
     }
