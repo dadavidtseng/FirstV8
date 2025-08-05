@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "Engine/Core/Rgba8.hpp"
-#include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Renderer/VertexUtils.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Game/Entity.hpp"
 

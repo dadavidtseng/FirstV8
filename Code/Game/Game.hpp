@@ -3,8 +3,8 @@
 //----------------------------------------------------------------------------------------------------
 
 #pragma once
-#include "Engine/Core/VertexUtils.hpp"
-#include "Engine/Core/Vertex_PCUTBN.hpp"
+#include "Engine/Renderer/VertexUtils.hpp"
+#include "Engine/Renderer/Vertex_PCUTBN.hpp"
 #include "Engine/Resource/ResourceHandle.hpp"
 #include <vector>
 #include <string>
