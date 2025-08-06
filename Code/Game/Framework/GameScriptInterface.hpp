@@ -25,15 +25,15 @@ public:
     virtual  ~GameScriptInterface() = default;
 
     // 實作 IScriptableObject 介面
-    virtual std::string                   GetScriptObjectName() const override;
-    virtual std::vector<ScriptMethodInfo> GetAvailableMethods() const override;
-    virtual ScriptMethodResult            CallMethod(const std::string& methodName,
-                                          const std::vector<std::any>&  args) override;
+    std::string                   GetScriptObjectName() const override;
+    std::vector<ScriptMethodInfo> GetAvailableMethods() const override;
+    ScriptMethodResult            CallMethod(const std::string& methodName,
+                                  const std::vector<std::any>&  args) override;
 
     // 實作屬性存取
-    virtual std::any                 GetProperty(const std::string& propertyName) const override;
-    virtual bool                     SetProperty(const std::string& propertyName, const std::any& value) override;
-    virtual std::vector<std::string> GetAvailableProperties() const override;
+    std::any                 GetProperty(const std::string& propertyName) const override;
+    bool                     SetProperty(const std::string& propertyName, const std::any& value) override;
+    std::vector<std::string> GetAvailableProperties() const override;
 
 private:
     Game* m_game; // 不擁有，只是參考

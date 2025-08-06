@@ -19,7 +19,7 @@ GameScriptInterface::GameScriptInterface(Game* game)
 {
     if (!m_game)
     {
-        ERROR_AND_DIE("GameScriptInterface: Game pointer cannot be null");
+        ERROR_AND_DIE("GameScriptInterface: Game pointer cannot be null")
     }
 }
 
@@ -34,39 +34,39 @@ std::vector<ScriptMethodInfo> GameScriptInterface::GetAvailableMethods() const
 {
     return {
         ScriptMethodInfo("createCube",
-                        "在指定位置創建一個立方體",
-                        {"float", "float", "float"},
-                        "string"),
+                         "在指定位置創建一個立方體",
+                         {"float", "float", "float"},
+                         "string"),
 
         ScriptMethodInfo("moveProp",
-                        "移動指定索引的道具到新位置",
-                        {"int", "float", "float", "float"},
-                        "string"),
+                         "移動指定索引的道具到新位置",
+                         {"int", "float", "float", "float"},
+                         "string"),
 
         ScriptMethodInfo("getPlayerPosition",
-                        "取得玩家目前位置",
-                        {},
-                        "object"),
+                         "取得玩家目前位置",
+                         {},
+                         "object"),
 
         ScriptMethodInfo("executeCommand",
-                        "執行 JavaScript 指令",
-                        {"string"},
-                        "string"),
+                         "執行 JavaScript 指令",
+                         {"string"},
+                         "string"),
 
         ScriptMethodInfo("executeFile",
-                        "執行 JavaScript 檔案",
-                        {"string"},
-                        "string"),
+                         "執行 JavaScript 檔案",
+                         {"string"},
+                         "string"),
 
         ScriptMethodInfo("isAttractMode",
-                        "檢查遊戲是否處於吸引模式",
-                        {},
-                        "bool"),
+                         "檢查遊戲是否處於吸引模式",
+                         {},
+                         "bool"),
 
         ScriptMethodInfo("getGameState",
-                        "取得目前遊戲狀態",
-                        {},
-                        "string")
+                         "取得目前遊戲狀態",
+                         {},
+                         "string")
     };
 }
 
@@ -80,8 +80,8 @@ std::vector<std::string> GameScriptInterface::GetAvailableProperties() const
 }
 
 //----------------------------------------------------------------------------------------------------
-ScriptMethodResult GameScriptInterface::CallMethod(const std::string& methodName,
-                                                  const std::vector<std::any>& args)
+ScriptMethodResult GameScriptInterface::CallMethod(const std::string&           methodName,
+                                                   const std::vector<std::any>& args)
 {
     try
     {
@@ -151,8 +151,7 @@ bool GameScriptInterface::SetProperty(const std::string& propertyName, const std
 ScriptMethodResult GameScriptInterface::ExecuteCreateCube(const std::vector<std::any>& args)
 {
     auto result = ValidateArgCount(args, 3, "createCube");
-    if (!result.success)
-        return result;
+    if (!result.success) return result;
 
     try
     {
@@ -173,12 +172,11 @@ ScriptMethodResult GameScriptInterface::ExecuteCreateCube(const std::vector<std:
 ScriptMethodResult GameScriptInterface::ExecuteMoveProp(const std::vector<std::any>& args)
 {
     auto result = ValidateArgCount(args, 4, "moveProp");
-    if (!result.success)
-        return result;
+    if (!result.success) return result;
 
     try
     {
-        int propIndex = ExtractInt(args[0]);
+        int  propIndex   = ExtractInt(args[0]);
         Vec3 newPosition = ExtractVec3(args, 1);
         m_game->MoveProp(propIndex, newPosition);
         return ScriptMethodResult::Success(std::string("道具 " + std::to_string(propIndex) +
@@ -197,8 +195,7 @@ ScriptMethodResult GameScriptInterface::ExecuteMoveProp(const std::vector<std::a
 ScriptMethodResult GameScriptInterface::ExecuteGetPlayerPosition(const std::vector<std::any>& args)
 {
     auto result = ValidateArgCount(args, 0, "getPlayerPosition");
-    if (!result.success)
-        return result;
+    if (!result.success) return result;
 
     try
     {
@@ -208,17 +205,13 @@ ScriptMethodResult GameScriptInterface::ExecuteGetPlayerPosition(const std::vect
             return ScriptMethodResult::Error("玩家物件不存在");
         }
 
-        // 這裡假設 Player 有 GetPosition 方法
-        // 您可能需要根據實際的 Player 類別 API 調整
-        // Vec3 position = player->GetPosition();
+        Vec3 position = player->m_position;
 
-        // 暫時回傳一個假的位置，您可以根據實際 API 修改
-        Vec3 position(0.0f, 0.0f, 0.0f);
 
         // 回傳一個可以被 JavaScript 使用的物件
         std::string positionStr = "{ x: " + std::to_string(position.x) +
-                                ", y: " + std::to_string(position.y) +
-                                ", z: " + std::to_string(position.z) + " }";
+            ", y: " + std::to_string(position.y) +
+            ", z: " + std::to_string(position.z) + " }";
 
         return ScriptMethodResult::Success(positionStr);
     }
@@ -232,8 +225,7 @@ ScriptMethodResult GameScriptInterface::ExecuteGetPlayerPosition(const std::vect
 ScriptMethodResult GameScriptInterface::ExecuteJavaScriptCommand(const std::vector<std::any>& args)
 {
     auto result = ValidateArgCount(args, 1, "executeCommand");
-    if (!result.success)
-        return result;
+    if (!result.success) return result;
 
     try
     {
@@ -251,8 +243,7 @@ ScriptMethodResult GameScriptInterface::ExecuteJavaScriptCommand(const std::vect
 ScriptMethodResult GameScriptInterface::ExecuteJavaScriptFile(const std::vector<std::any>& args)
 {
     auto result = ValidateArgCount(args, 1, "executeFile");
-    if (!result.success)
-        return result;
+    if (!result.success) return result;
 
     try
     {
@@ -270,8 +261,7 @@ ScriptMethodResult GameScriptInterface::ExecuteJavaScriptFile(const std::vector<
 ScriptMethodResult GameScriptInterface::ExecuteIsAttractMode(const std::vector<std::any>& args)
 {
     auto result = ValidateArgCount(args, 0, "isAttractMode");
-    if (!result.success)
-        return result;
+    if (!result.success) return result;
 
     try
     {
@@ -288,8 +278,7 @@ ScriptMethodResult GameScriptInterface::ExecuteIsAttractMode(const std::vector<s
 ScriptMethodResult GameScriptInterface::ExecuteGetGameState(const std::vector<std::any>& args)
 {
     auto result = ValidateArgCount(args, 0, "getGameState");
-    if (!result.success)
-        return result;
+    if (!result.success) return result;
 
     try
     {
@@ -306,7 +295,7 @@ ScriptMethodResult GameScriptInterface::ExecuteGetGameState(const std::vector<st
 // 輔助方法實作
 //----------------------------------------------------------------------------------------------------
 
-template<typename T>
+template <typename T>
 T GameScriptInterface::ExtractArg(const std::any& arg, const std::string& expectedType) const
 {
     try
@@ -435,8 +424,8 @@ bool GameScriptInterface::ExtractBool(const std::any& arg) const
 
 //----------------------------------------------------------------------------------------------------
 ScriptMethodResult GameScriptInterface::ValidateArgCount(const std::vector<std::any>& args,
-                                                        size_t expectedCount,
-                                                        const std::string& methodName) const
+                                                         size_t                       expectedCount,
+                                                         const std::string&           methodName) const
 {
     if (args.size() != expectedCount)
     {
@@ -449,9 +438,9 @@ ScriptMethodResult GameScriptInterface::ValidateArgCount(const std::vector<std::
 
 //----------------------------------------------------------------------------------------------------
 ScriptMethodResult GameScriptInterface::ValidateArgCountRange(const std::vector<std::any>& args,
-                                                            size_t minCount,
-                                                            size_t maxCount,
-                                                            const std::string& methodName) const
+                                                              size_t                       minCount,
+                                                              size_t                       maxCount,
+                                                              const std::string&           methodName) const
 {
     if (args.size() < minCount || args.size() > maxCount)
     {

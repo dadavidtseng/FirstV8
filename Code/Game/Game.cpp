@@ -545,15 +545,17 @@ void Game::HandleJavaScriptCommands()
         ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
     }
 
-    if (g_theInput->WasKeyJustPressed('K'))
+    if (g_theInput->IsKeyDown('K'))
     {
-        ExecuteJavaScriptCommand("game.createCube(Math.random() * 10 - 5, 0, Math.random() * 10 - 5);");
-        // CreateCube(Vec3::ZERO);
+        // ExecuteJavaScriptCommand("game.createCube(Math.random() * 10 - 5, 0, Math.random() * 10 - 5);");
+        ExecuteJavaScriptCommand("game.moveProp(0, Math.random() * 10 - 5, 0, Math.random() * 10 - 5);");
     }
 
     if (g_theInput->WasKeyJustPressed('L'))
     {
-        ExecuteJavaScriptCommand("var pos = game.getPlayerPos(); console.log('玩家位置:', pos);");
+        ExecuteJavaScriptCommand("var pos = game.getPlayerPosition(); console.log('Player Position:', pos);");
+        // ExecuteJavaScriptCommand("console.log('這是真的 JavaScript 輸出！'); 42;");
+
     }
 }
 

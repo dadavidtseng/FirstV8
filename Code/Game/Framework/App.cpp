@@ -137,6 +137,7 @@ void App::Startup()
     sV8SubsystemConfig v8Config;
     v8Config.enableDebugging    = true;
     v8Config.heapSizeLimit      = 256;
+    v8Config.enableConsoleOutput = true;
     g_theV8Subsystem            = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem----------------------------------------------------------------------------
