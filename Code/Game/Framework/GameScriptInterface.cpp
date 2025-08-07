@@ -11,13 +11,14 @@
 #include <stdexcept>
 #include <sstream>
 
+#include "GameCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 //----------------------------------------------------------------------------------------------------
 GameScriptInterface::GameScriptInterface(Game* game)
     : m_game(game)
 {
-    if (!m_game)
+    if (!g_theGame)
     {
         ERROR_AND_DIE("GameScriptInterface: Game pointer cannot be null")
     }
@@ -80,8 +81,8 @@ std::vector<std::string> GameScriptInterface::GetAvailableProperties() const
 }
 
 //----------------------------------------------------------------------------------------------------
-ScriptMethodResult GameScriptInterface::CallMethod(const std::string&           methodName,
-                                                   const std::vector<std::any>& args)
+ScriptMethodResult GameScriptInterface::CallMethod(std::string const&           methodName,
+                                                   std::vector<std::any> const& args)
 {
     try
     {
@@ -116,7 +117,7 @@ ScriptMethodResult GameScriptInterface::CallMethod(const std::string&           
 
         return ScriptMethodResult::Error("未知的方法: " + methodName);
     }
-    catch (const std::exception& e)
+    catch (std::exception const& e)
     {
         return ScriptMethodResult::Error("方法執行時發生例外: " + std::string(e.what()));
     }

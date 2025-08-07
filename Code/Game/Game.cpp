@@ -553,7 +553,8 @@ void Game::HandleJavaScriptCommands()
 
     if (g_theInput->WasKeyJustPressed('L'))
     {
-        ExecuteJavaScriptCommand("var pos = game.getPlayerPosition(); console.log('Player Position:', pos);");
+        // ExecuteJavaScriptCommand("var pos = game.getPlayerPosition(); console.log('Player Position:', pos);");
+        ExecuteJavaScriptCommand("debug('Player Position');");
         // ExecuteJavaScriptCommand("console.log('這是真的 JavaScript 輸出！'); 42;");
 
     }

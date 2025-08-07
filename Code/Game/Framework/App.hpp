@@ -4,6 +4,8 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
+#include <memory>
+
 #include "Engine/Core/EventSystem.hpp"
 #include "Game/Framework/GameScriptInterface.hpp"
 
@@ -32,8 +34,11 @@ private:
     void Render() const;
     void EndFrame() const;
 
+    static std::any OnPrint(std::vector<std::any> const& args);
+    static std::any OnDebug(std::vector<std::any> const& args);
+    static std::any OnGarbageCollection(std::vector<std::any> const& args);
+
     void UpdateCursorMode();
-    void DeleteAndCreateNewGame();
     void SetupScriptingBindings();
 
     Camera*                              m_devConsoleCamera = nullptr;

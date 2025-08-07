@@ -62,7 +62,7 @@ void App::Startup()
     sWindowConfig.m_aspectRatio = 2.f;
     sWindowConfig.m_inputSystem = g_theInput;
     sWindowConfig.m_windowTitle = "FirstV8";
-    g_theWindow                = new Window(sWindowConfig);
+    g_theWindow                 = new Window(sWindowConfig);
 
     //-End-of-Window----------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ void App::Startup()
 
     sRendererConfig sRendererConfig;
     sRendererConfig.m_window = g_theWindow;
-    g_theRenderer           = new Renderer(sRendererConfig);
+    g_theRenderer            = new Renderer(sRendererConfig);
 
     //-End-of-Renderer--------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ void App::Startup()
 
     sDebugRenderConfig sDebugRenderConfig;
     sDebugRenderConfig.m_renderer = g_theRenderer;
-    sDebugRenderConfig.m_fontName = "SquirrelFixedFont";
+    sDebugRenderConfig.m_fontName = "DaemonFont";
 
     //-End-of-DebugRender-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void App::Startup()
 
     sDevConsoleConfig devConsoleConfig;
     devConsoleConfig.m_defaultRenderer = g_theRenderer;
-    devConsoleConfig.m_defaultFontName = "SquirrelFixedFont";
+    devConsoleConfig.m_defaultFontName = "DaemonFont";
     devConsoleConfig.m_defaultCamera   = m_devConsoleCamera;
     g_theDevConsole                    = new DevConsole(devConsoleConfig);
 
@@ -115,7 +115,7 @@ void App::Startup()
     //------------------------------------------------------------------------------------------------
     //-Start-of-AudioSystem---------------------------------------------------------------------------
 
-    sAudioSystemConfig constexpr  sAudioSystemConfig;
+    sAudioSystemConfig constexpr sAudioSystemConfig;
     g_theAudio = new AudioSystem(sAudioSystemConfig);
 
     sLightConfig constexpr lightConfig;
@@ -135,10 +135,10 @@ void App::Startup()
     //-Start-of-V8Subsystem--------------------------------------------------------------------------
 
     sV8SubsystemConfig v8Config;
-    v8Config.enableDebugging    = true;
-    v8Config.heapSizeLimit      = 256;
+    v8Config.enableDebugging     = true;
+    v8Config.heapSizeLimit       = 256;
     v8Config.enableConsoleOutput = true;
-    g_theV8Subsystem            = new V8Subsystem(v8Config);
+    g_theV8Subsystem             = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem----------------------------------------------------------------------------
 
@@ -153,7 +153,7 @@ void App::Startup()
     g_theResourceSubsystem->Startup();
     g_theV8Subsystem->Startup();
 
-    g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
+    g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/DaemonFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
     g_theRNG        = new RandomNumberGenerator();
     g_theGame       = new Game();
     SetupScriptingBindings();
@@ -292,6 +292,57 @@ void App::EndFrame() const
 }
 
 //----------------------------------------------------------------------------------------------------
+STATIC std::any App::OnPrint(std::vector<std::any> const& args)
+{
+    if (!args.empty())
+    {
+        try
+        {
+            std::string message = std::any_cast<std::string>(args[0]);
+            DebuggerPrintf("JS: %s\n", message.c_str());
+
+            if (g_theDevConsole)
+            {
+                g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "JS: " + message);
+            }
+        }
+        catch (std::bad_any_cast const&)
+        {
+            DebuggerPrintf("JS: [無法轉換的物件]\n");
+        }
+    }
+    return std::any{};
+}
+
+std::any App::OnDebug(std::vector<std::any> const& args)
+{
+    if (!args.empty())
+    {
+        try
+        {
+            std::string message = std::any_cast<std::string>(args[0]);
+            DebuggerPrintf("JS DEBUG: %s\n", message.c_str());
+        }
+        catch ( std::bad_any_cast const&)
+        {
+            DebuggerPrintf("JS DEBUG: [無法轉換的物件]\n");
+        }
+    }
+    return std::any{};
+}
+
+std::any App::OnGarbageCollection(std::vector<std::any> const& args)
+{
+    UNUSED(args)
+    if (g_theV8Subsystem)
+    {
+        g_theV8Subsystem->ForceGarbageCollection();
+        DebuggerPrintf("JS: 垃圾回收已執行\n");
+    }
+    return std::any{};
+}
+
+//----------------------------------------------------------------------------------------------------
 void App::UpdateCursorMode()
 {
     bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindow->GetWindowHandle();
@@ -307,75 +358,17 @@ void App::UpdateCursorMode()
     }
 }
 
-//----------------------------------------------------------------------------------------------------
-void App::DeleteAndCreateNewGame()
-{
-    delete g_theGame;
-    g_theGame = nullptr;
-
-    g_theGame = new Game();
-}
-
 void App::SetupScriptingBindings()
 {
     if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized() && g_theGame)
     {
         DebuggerPrintf("設定腳本綁定...\n");
 
-        // 創建 Game 的腳本介面
         m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_theGame);
         g_theV8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
-
-        // 註冊一些實用的全域函式
-        g_theV8Subsystem->RegisterGlobalFunction("print", [](const std::vector<std::any>& args) -> std::any {
-            if (!args.empty())
-            {
-                try
-                {
-                    std::string message = std::any_cast<std::string>(args[0]);
-                    DebuggerPrintf("JS: %s\n", message.c_str());
-
-                    // 如果有 DevConsole，也可以輸出到那裡
-                    if (g_theDevConsole)
-                    {
-                        g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "JS: " + message);
-                    }
-                }
-                catch (const std::bad_any_cast&)
-                {
-                    DebuggerPrintf("JS: [無法轉換的物件]\n");
-                }
-            }
-            return std::any{};
-        });
-
-        // 註冊除錯函式
-        g_theV8Subsystem->RegisterGlobalFunction("debug", [](const std::vector<std::any>& args) -> std::any {
-            if (!args.empty())
-            {
-                try
-                {
-                    std::string message = std::any_cast<std::string>(args[0]);
-                    DebuggerPrintf("JS DEBUG: %s\n", message.c_str());
-                }
-                catch (const std::bad_any_cast&)
-                {
-                    DebuggerPrintf("JS DEBUG: [無法轉換的物件]\n");
-                }
-            }
-            return std::any{};
-        });
-
-        // 註冊清理記憶體函式
-        g_theV8Subsystem->RegisterGlobalFunction("gc", [](const std::vector<std::any>& args) -> std::any {
-            UNUSED(args);
-            if (g_theV8Subsystem)
-            {
-                g_theV8Subsystem->ForceGarbageCollection();
-                DebuggerPrintf("JS: 垃圾回收已執行\n");
-            }
-            return std::any{};
-        });
+        g_theV8Subsystem->RegisterGlobalFunction("print", OnPrint);
+        g_theV8Subsystem->RegisterGlobalFunction("debug", OnDebug);
+        g_theV8Subsystem->RegisterGlobalFunction("gc", OnGarbageCollection);
 
         DebuggerPrintf("腳本綁定設定完成！\n");
     }

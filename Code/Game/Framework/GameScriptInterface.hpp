@@ -1,15 +1,12 @@
 //----------------------------------------------------------------------------------------------------
 // GameScriptInterface.hpp
-// Game 類別的腳本介面包裝器 - 讓 JavaScript 可以與 Game 物件互動
 //----------------------------------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------------
 #pragma once
 #include "Engine/Scripting/IScriptableObject.hpp"
-#include <memory>
 
-//----------------------------------------------------------------------------------------------------
-// 前向宣告
-//----------------------------------------------------------------------------------------------------
+//-Forward-Declaration--------------------------------------------------------------------------------
 class Game;
 class Player;
 struct Vec3;
@@ -22,13 +19,11 @@ class GameScriptInterface : public IScriptableObject
 {
 public:
     explicit GameScriptInterface(Game* game);
-    virtual  ~GameScriptInterface() = default;
 
     // 實作 IScriptableObject 介面
     std::string                   GetScriptObjectName() const override;
     std::vector<ScriptMethodInfo> GetAvailableMethods() const override;
-    ScriptMethodResult            CallMethod(const std::string& methodName,
-                                  const std::vector<std::any>&  args) override;
+    ScriptMethodResult            CallMethod(std::string const & methodName,  std::vector<std::any> const& args) override;
 
     // 實作屬性存取
     std::any                 GetProperty(const std::string& propertyName) const override;
