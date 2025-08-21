@@ -58,6 +58,7 @@ private:
     ScriptMethodResult ExecuteCreateCube(const std::vector<std::any>& args);
     ScriptMethodResult ExecuteMoveProp(const std::vector<std::any>& args);
     ScriptMethodResult ExecuteGetPlayerPosition(const std::vector<std::any>& args);
+    ScriptMethodResult ExecuteMovePlayerCamera(const std::vector<std::any>& args);  // 新增：移動玩家相機
     ScriptMethodResult ExecuteJavaScriptCommand(const std::vector<std::any>& args);
     ScriptMethodResult ExecuteJavaScriptFile(const std::vector<std::any>& args);
     ScriptMethodResult ExecuteIsAttractMode(const std::vector<std::any>& args);

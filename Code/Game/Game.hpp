@@ -32,9 +32,7 @@ public:
     Game();
     ~Game();
 
-    void Startup();    // 新增：初始化方法
-    void Shutdown();   // 新增：清理方法
-    void Update();  // 修改：加入 deltaSeconds 參數
+    void Update();
     void Render() const;
     bool IsAttractMode() const;
 
@@ -42,17 +40,15 @@ public:
     void ExecuteJavaScriptCommand(const std::string& command);
     void ExecuteJavaScriptFile(const std::string& filename);
     void HandleJavaScriptCommands();
-
+    
     // 新增：JavaScript 回呼函數需要的遊戲功能
     void    CreateCube(const Vec3& position);
     void    MoveProp(int propIndex, const Vec3& newPosition);
+    void    MovePlayerCamera(const Vec3& offset);  // 新增：移動玩家相機
     Player* GetPlayer();
 
     // 新增：控制台命令處理
     void HandleConsoleCommands();
-
-    // 新增：公開相機存取（給 V8Subsystem 使用）
-    Camera* m_worldCamera = nullptr;
 
 private:
     void UpdateFromKeyBoard();

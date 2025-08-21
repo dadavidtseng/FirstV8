@@ -1,5 +1,3 @@
-// test_scripts.js - Protogame3D JavaScript test script
-
 // Basic test functions
 function basicTests() {
     console.log("=== Basic JavaScript Tests ===");

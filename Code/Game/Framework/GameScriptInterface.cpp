@@ -49,6 +49,11 @@ std::vector<ScriptMethodInfo> GameScriptInterface::GetAvailableMethods() const
                          {},
                          "object"),
 
+        ScriptMethodInfo("movePlayerCamera",
+                         "移動玩家相機（用於晃動效果）",
+                         {"float", "float", "float"},
+                         "string"),
+
         ScriptMethodInfo("executeCommand",
                          "執行 JavaScript 指令",
                          {"string"},
@@ -97,6 +102,10 @@ ScriptMethodResult GameScriptInterface::CallMethod(std::string const&           
         else if (methodName == "getPlayerPosition")
         {
             return ExecuteGetPlayerPosition(args);
+        }
+        else if (methodName == "movePlayerCamera")
+        {
+            return ExecuteMovePlayerCamera(args);
         }
         else if (methodName == "executeCommand")
         {
@@ -219,6 +228,27 @@ ScriptMethodResult GameScriptInterface::ExecuteGetPlayerPosition(const std::vect
     catch (const std::exception& e)
     {
         return ScriptMethodResult::Error("取得玩家位置失敗: " + std::string(e.what()));
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+ScriptMethodResult GameScriptInterface::ExecuteMovePlayerCamera(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 3, "movePlayerCamera");
+    if (!result.success) return result;
+
+    try
+    {
+        Vec3 offset = ExtractVec3(args, 0);
+        m_game->MovePlayerCamera(offset);
+        return ScriptMethodResult::Success(std::string("相機位置已移動: (" +
+            std::to_string(offset.x) + ", " +
+            std::to_string(offset.y) + ", " +
+            std::to_string(offset.z) + ")"));
+    }
+    catch (const std::exception& e)
+    {
+        return ScriptMethodResult::Error("移動玩家相機失敗: " + std::string(e.what()));
     }
 }
 

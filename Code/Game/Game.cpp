@@ -30,6 +30,13 @@ Game::Game()
     SpawnPlayer();
     SpawnProp();
 
+    // 初始化 props 向量
+    if (m_firstCube) m_props.push_back(m_firstCube);
+    if (m_secondCube) m_props.push_back(m_secondCube);
+    if (m_sphere) m_props.push_back(m_sphere);
+    if (m_grid) m_props.push_back(m_grid);
+
+    m_gameState    = eGameState::GAME;
     m_screenCamera = new Camera();
 
     Vec2 const bottomLeft = Vec2::ZERO;
@@ -62,6 +69,7 @@ Game::Game()
 
     // // 執行一些測試腳本
     // RunJavaScriptTests();
+    // ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -69,75 +77,22 @@ Game::~Game()
 {
     DebuggerPrintf("遊戲關閉中...\n");
 
-    // 清理物件（保持原本的清理邏輯）
-    for (Prop* prop : m_props)
-    {
-        delete prop;
-    }
     m_props.clear();
 
-    delete m_gameClock;
-    m_gameClock = nullptr;
-
-    delete m_grid;
-    m_grid = nullptr;
-
-    delete m_sphere;
-    m_sphere = nullptr;
-
-    delete m_secondCube;
-    m_secondCube = nullptr;
-
-    delete m_firstCube;
-    m_firstCube = nullptr;
-
-    delete m_player;
-    m_player = nullptr;
-
-    delete m_screenCamera;
-    m_screenCamera = nullptr;
-
-    delete m_worldCamera;
-    m_worldCamera = nullptr;
+    GAME_SAFE_RELEASE(m_gameClock);
+    GAME_SAFE_RELEASE(m_grid);
+    GAME_SAFE_RELEASE(m_sphere);
+    GAME_SAFE_RELEASE(m_secondCube);
+    GAME_SAFE_RELEASE(m_firstCube);
+    GAME_SAFE_RELEASE(m_player);
+    GAME_SAFE_RELEASE(m_screenCamera);
 
     DebuggerPrintf("遊戲關閉完成。\n");
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::Startup()
-{
-    DebuggerPrintf("遊戲啟動中...\n");
-
-    // 建立遊戲物件
-    m_gameClock = new Clock();
-
-    // 建立相機
-    m_screenCamera = new Camera();
-    m_worldCamera  = new Camera();
-
-    // 生成遊戲實體
-    SpawnPlayer();
-    SpawnProp();
-
-    // 初始化 props 向量
-    if (m_firstCube) m_props.push_back(m_firstCube);
-    if (m_secondCube) m_props.push_back(m_secondCube);
-    if (m_sphere) m_props.push_back(m_sphere);
-    if (m_grid) m_props.push_back(m_grid);
-
-    m_gameState = eGameState::GAME;
-
-    DebuggerPrintf("遊戲啟動完成！\n");
-}
-
-void Game::Shutdown()
-{
-}
-
-//----------------------------------------------------------------------------------------------------
 void Game::Update()
 {
-    // 原本的更新邏輯
     float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
     float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
 
@@ -149,10 +104,27 @@ void Game::Update()
     HandleJavaScriptCommands();
     HandleConsoleCommands();
 
+    // 基本相機晃動更新
+    static int shakeCounter = 0;
+    if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
+    {
+        shakeCounter++;
+        if (shakeCounter >= 2) // 每 2 幀更新一次
+        {
+            ExecuteJavaScriptCommand("updateShake();");
+
+            shakeCounter = 0;
+        }
+    }
+
     // 新增：一次性 JavaScript 測試
     if (!m_hasRunJSTests && g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
     {
         RunJavaScriptTests();
+
+        // 載入基本相機晃動
+        ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
+
         m_hasRunJSTests = true;
     }
 }
@@ -542,7 +514,7 @@ void Game::HandleJavaScriptCommands()
     if (g_theInput->WasKeyJustPressed('J'))
     {
         // ExecuteJavaScriptCommand("console.log('J 鍵觸發的 JavaScript!');");
-        ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
+        ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
     }
 
     if (g_theInput->IsKeyDown('K'))
@@ -556,7 +528,6 @@ void Game::HandleJavaScriptCommands()
         // ExecuteJavaScriptCommand("var pos = game.getPlayerPosition(); console.log('Player Position:', pos);");
         ExecuteJavaScriptCommand("debug('Player Position');");
         // ExecuteJavaScriptCommand("console.log('這是真的 JavaScript 輸出！'); 42;");
-
     }
 }
 
@@ -600,6 +571,22 @@ void Game::MoveProp(int propIndex, Vec3 const& newPosition)
 Player* Game::GetPlayer()
 {
     return m_player;
+}
+
+//----------------------------------------------------------------------------------------------------
+void Game::MovePlayerCamera(Vec3 const& offset)
+{
+    if (m_player && m_player->GetCamera())
+    {
+        // 取得玩家相機的目前位置
+        Vec3 currentPos = m_player->GetCamera()->GetPosition();
+
+        // 套用偏移
+        Vec3 newPos = currentPos + offset;
+
+        // 設定新位置
+        m_player->GetCamera()->SetPosition(newPos);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
