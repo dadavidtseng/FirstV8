@@ -9,6 +9,7 @@
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/LogSubsystem.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Platform/Window.hpp"
@@ -29,12 +30,6 @@ Game::Game()
 {
     SpawnPlayer();
     SpawnProp();
-
-    // 初始化 props 向量
-    if (m_firstCube) m_props.push_back(m_firstCube);
-    if (m_secondCube) m_props.push_back(m_secondCube);
-    if (m_sphere) m_props.push_back(m_sphere);
-    if (m_grid) m_props.push_back(m_grid);
 
     m_gameState    = eGameState::GAME;
     m_screenCamera = new Camera();
@@ -109,10 +104,9 @@ void Game::Update()
     if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
     {
         shakeCounter++;
-        if (shakeCounter >= 2) // 每 2 幀更新一次
+        if (shakeCounter >= 60) // 改為每 60 幀（約1秒）更新一次
         {
-            ExecuteJavaScriptCommand("updateShake();");
-
+            // ExecuteJavaScriptCommand("updateShake();");
             shakeCounter = 0;
         }
     }
@@ -213,6 +207,10 @@ void Game::UpdateFromKeyBoard()
 
     if (m_gameState == eGameState::GAME)
     {
+        if (g_theInput->WasKeyJustPressed(KEYCODE_G))
+        {
+            DAEMON_LOG(LogTemp, eLogVerbosity::Warning, "G");
+        }
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
             m_gameState = eGameState::ATTRACT;
@@ -444,6 +442,11 @@ void Game::SpawnProp()
     m_secondCube->InitializeLocalVertsForCube();
     m_sphere->InitializeLocalVertsForSphere();
     m_grid->InitializeLocalVertsForGrid();
+
+    if (m_firstCube) m_props.push_back(m_firstCube);
+    if (m_secondCube) m_props.push_back(m_secondCube);
+    if (m_sphere) m_props.push_back(m_sphere);
+    if (m_grid) m_props.push_back(m_grid);
 }
 
 

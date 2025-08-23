@@ -1,0 +1,82 @@
+[08:01:17.474] [59108] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:01:17.532] [59108] [LogTemp] [Display] 遊戲開始初始化
+[08:06:21.092] [70388] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:06:21.126] [70388] [LogTemp] [Display] 遊戲開始初始化
+[08:12:15.475] [30220] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:12:15.510] [30220] [LogTemp] [Display] 遊戲開始初始化
+[08:14:34.671] [43816] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:14:34.715] [43816] [LogTemp] [Display] A
+[08:14:34.715] [43816] [LogTemp] [Error] B
+[08:14:34.715] [43816] [LogTemp] [Warning] C
+[08:14:34.715] [43816] [LogTemp] [Warning] C
+[08:15:22.003] [67552] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:15:22.043] [67552] [LogTemp] [Display] A
+[08:15:22.043] [67552] [LogTemp] [Error] B
+[08:15:22.043] [67552] [LogTemp] [Warning] C
+[08:15:22.043] [67552] [LogTemp] [Warning] C
+[08:15:39.997] [67552] [LogTemp] [Warning] G
+[08:15:40.614] [67552] [LogTemp] [Warning] G
+[08:15:40.947] [67552] [LogTemp] [Warning] G
+[08:15:41.148] [67552] [LogTemp] [Warning] G
+[08:15:41.339] [67552] [LogTemp] [Warning] G
+[08:15:41.531] [67552] [LogTemp] [Warning] G
+[08:15:41.764] [67552] [LogTemp] [Warning] G
+[08:15:41.948] [67552] [LogTemp] [Warning] G
+[08:15:42.123] [67552] [LogTemp] [Warning] G
+[08:15:42.298] [67552] [LogTemp] [Warning] G
+[08:15:42.464] [67552] [LogTemp] [Warning] G
+[08:15:42.631] [67552] [LogTemp] [Warning] G
+[08:15:42.789] [67552] [LogTemp] [Warning] G
+[08:16:03.977] [34500] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:16:04.017] [34500] [LogTemp] [Display] A
+[08:16:04.017] [34500] [LogTemp] [Error] B
+[08:16:04.017] [34500] [LogTemp] [Warning] C
+[08:16:04.017] [34500] [LogTemp] [Warning] C
+[08:16:06.138] [34500] [LogTemp] [Warning] G
+[08:16:06.329] [34500] [LogTemp] [Warning] G
+[08:16:06.513] [34500] [LogTemp] [Warning] G
+[08:16:06.704] [34500] [LogTemp] [Warning] G
+[08:16:06.904] [34500] [LogTemp] [Warning] G
+[08:16:07.104] [34500] [LogTemp] [Warning] G
+[08:16:07.321] [34500] [LogTemp] [Warning] G
+[08:16:11.331] [5256] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:16:11.366] [5256] [LogTemp] [Display] A
+[08:16:11.366] [5256] [LogTemp] [Error] B
+[08:16:11.366] [5256] [LogTemp] [Warning] C
+[08:16:11.366] [5256] [LogTemp] [Warning] C
+[08:16:11.854] [5256] [LogTemp] [Warning] G
+[08:16:12.063] [5256] [LogTemp] [Warning] G
+[08:16:12.246] [5256] [LogTemp] [Warning] G
+[08:16:12.438] [5256] [LogTemp] [Warning] G
+[08:16:12.638] [5256] [LogTemp] [Warning] G
+[08:20:22.887] [70512] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:20:22.935] [70512] [LogTemp] [Display] A
+[08:20:22.935] [70512] [LogTemp] [Error] B
+[08:20:22.935] [70512] [LogTemp] [Warning] C
+[08:20:22.936] [70512] [LogTemp] [Warning] C
+[08:21:15.121] [55108] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:21:15.162] [55108] [LogTemp] [Display] A
+[08:21:15.162] [55108] [LogTemp] [Error] B
+[08:21:15.162] [55108] [LogTemp] [Warning] C
+[08:21:15.162] [55108] [LogTemp] [Warning] C
+[08:21:52.022] [55108] [LogTemp] [Warning] G
+[08:23:04.327] [48780] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:23:04.368] [48780] [LogTemp] [Display] A
+[08:23:04.368] [48780] [LogTemp] [Error] B
+[08:23:04.368] [48780] [LogTemp] [Warning] C
+[08:23:04.368] [48780] [LogTemp] [Warning] C
+[08:24:42.901] [54964] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:25:55.430] [68992] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:25:55.470] [68992] [LogTemp] [Fatal] A
+[08:25:55.470] [68992] [LogTemp] [Display] A
+[08:25:55.470] [68992] [LogTemp] [Warning] A
+[08:26:18.078] [55060] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:26:18.124] [55060] [LogTemp] [Fatal] A
+[08:26:18.124] [55060] [LogTemp] [Display] A
+[08:26:18.124] [55060] [LogTemp] [Warning] A
+[08:26:33.401] [70624] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:26:42.739] [10744] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:27:18.596] [32756] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:27:29.016] [68016] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:27:41.190] [53064] [LogCore] [Display] DaemonEngine LogSubsystem 已啟動
+[08:27:41.227] [53064] [LogTemp] [Fatal] A
