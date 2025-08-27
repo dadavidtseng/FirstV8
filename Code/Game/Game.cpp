@@ -101,13 +101,19 @@ void Game::Update()
 
     // 基本相機晃動更新
     static int shakeCounter = 0;
+
     if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
     {
         shakeCounter++;
-        if (shakeCounter >= 60) // 改為每 60 幀（約1秒）更新一次
+
+        if (shakeCounter >= 60)
         {
-            // ExecuteJavaScriptCommand("updateShake();");
+            ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
             shakeCounter = 0;
+        }
+        if (shakeCounter >= 2)
+        {
+            ExecuteJavaScriptCommand("updateShake();");
         }
     }
 
@@ -517,7 +523,7 @@ void Game::HandleJavaScriptCommands()
     if (g_theInput->WasKeyJustPressed('J'))
     {
         // ExecuteJavaScriptCommand("console.log('J 鍵觸發的 JavaScript!');");
-        ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
+        ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
     }
 
     if (g_theInput->IsKeyDown('K'))
@@ -579,16 +585,19 @@ Player* Game::GetPlayer()
 //----------------------------------------------------------------------------------------------------
 void Game::MovePlayerCamera(Vec3 const& offset)
 {
-    if (m_player && m_player->GetCamera())
+    if (m_player)
     {
-        // 取得玩家相機的目前位置
-        Vec3 currentPos = m_player->GetCamera()->GetPosition();
+        if (!m_cameraShakeActive)
+        {
+            m_originalPlayerPosition = m_player->m_position;
+            m_cameraShakeActive = true;
+            DebuggerPrintf("開始相機震動，原始位置: (%.3f, %.3f, %.3f)\n",
+                          m_originalPlayerPosition.x, m_originalPlayerPosition.y, m_originalPlayerPosition.z);
+        }
 
-        // 套用偏移
-        Vec3 newPos = currentPos + offset;
-
-        // 設定新位置
-        m_player->GetCamera()->SetPosition(newPos);
+        // 基於原始位置計算新位置（而不是當前位置）
+        Vec3 newPosition = m_originalPlayerPosition + offset;
+        m_player->m_position = newPosition;
     }
 }
 

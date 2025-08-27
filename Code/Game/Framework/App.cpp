@@ -113,6 +113,25 @@ void App::Startup()
     g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(SPACE) Start Game");
 
     //-End-of-DevConsole------------------------------------------------------------------------------
+
+    //-Start-of-LogSubsystem--------------------------------------------------------------------------
+
+    sLogSubsystemConfig config;
+    config.logFilePath = "Logs/MyGame.log";        // 日誌檔案路徑
+    config.enableConsole = true;                   // 啟用控制台輸出
+    config.enableFile = true;                      // 啟用檔案輸出
+    config.enableDebugOut = true;                  // 啟用 Visual Studio 輸出
+    config.enableOnScreen = true;                  // 啟用螢幕輸出
+    config.enableDevConsole = true;                // 啟用開發者控制台輸出
+    config.asyncLogging = true;                    // 啟用非同步日誌
+    config.maxLogEntries = 50000;                  // 記憶體中最大日誌條目數
+    config.timestampEnabled = true;               // 啟用時間戳記
+    config.threadIdEnabled = true;                 // 啟用執行緒 ID
+    config.autoFlush = false;                      // 不自動重新整理（效能考量）
+
+    // 建立並啟動日誌子系統
+    g_theLogSubsystem = new LogSubsystem(config);
+
     //------------------------------------------------------------------------------------------------
     //-Start-of-AudioSystem---------------------------------------------------------------------------
 
@@ -133,7 +152,11 @@ void App::Startup()
 
     //-End-of-ResourceSubsystem-----------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
-    //-Start-of-V8Subsystem--------------------------------------------------------------------------
+
+
+
+
+    //-Start-of-V8Subsystem---------------------------------------------------------------------------
 
     sV8SubsystemConfig v8Config;
     v8Config.enableDebugging     = true;
@@ -141,36 +164,20 @@ void App::Startup()
     v8Config.enableConsoleOutput = true;
     g_theV8Subsystem             = new V8Subsystem(v8Config);
 
-    //-End-of-V8Subsystem----------------------------------------------------------------------------
-
-    // 設定日誌子系統配置
-    sLogSubsystemConfig config;
-    config.logFilePath = "Logs/MyGame.log";        // 日誌檔案路徑
-    config.enableConsole = true;                   // 啟用控制台輸出
-    config.enableFile = true;                      // 啟用檔案輸出
-    config.enableDebugOut = true;                  // 啟用 Visual Studio 輸出
-    config.enableOnScreen = true;                  // 啟用螢幕輸出
-    config.enableDevConsole = true;                // 啟用開發者控制台輸出
-    config.asyncLogging = true;                    // 啟用非同步日誌
-    config.maxLogEntries = 50000;                  // 記憶體中最大日誌條目數
-    config.timestampEnabled = true;               // 啟用時間戳記
-    config.threadIdEnabled = true;                 // 啟用執行緒 ID
-    config.autoFlush = false;                      // 不自動重新整理（效能考量）
-
-    // 建立並啟動日誌子系統
-    g_theLogSubsystem = new LogSubsystem(config);
+    //-End-of-V8Subsystem-----------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
 
     g_theEventSystem->Startup();
     g_theWindow->Startup();
     g_theRenderer->Startup();
     DebugRenderSystemStartup(sDebugRenderConfig);
     g_theDevConsole->StartUp();
+    g_theLogSubsystem->Startup();
     g_theInput->Startup();
     g_theAudio->Startup();
     g_theLightSubsystem->StartUp();
     g_theResourceSubsystem->Startup();
     g_theV8Subsystem->Startup();
-    g_theLogSubsystem->Startup();
 
     g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/DaemonFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
     g_theRNG        = new RandomNumberGenerator();
@@ -179,7 +186,7 @@ void App::Startup()
     g_theLogSubsystem->RegisterCategory("LogMyGame", eLogVerbosity::Log, eLogVerbosity::All);
     g_theLogSubsystem->RegisterCategory("LogPlayerSystem", eLogVerbosity::Verbose, eLogVerbosity::All);
     g_theLogSubsystem->RegisterCategory("LogPhysics", eLogVerbosity::Warning, eLogVerbosity::All);
-    // DAEMON_LOG(LogTemp, eLogVerbosity::Fatal, "A");
+    DAEMON_LOG(LogTemp, eLogVerbosity::Fatal, "A");
     // DAEMON_LOG(LogTemp, eLogVerbosity::Display, "A");
     // DAEMON_LOG(LogTemp, eLogVerbosity::Warning, "A");
 }

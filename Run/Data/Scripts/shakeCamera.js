@@ -1,24 +1,24 @@
-// shakeCamera.js - 相機晃動（使用真正的相機移動）
+//---------------------------------------------------------------------------------------------------- 
+// shakeCamera.js 
+//----------------------------------------------------------------------------------------------------
 
 console.log("=== 相機晃動系統 ===");
 
-// 簡單的晃動狀態
-var shake = {
+//----------------------------------------------------------------------------------------------------
+const shake = {
     time: 0.0,
-    intensity: 0.05,
+    intensity: 0.5,
     frequency: 8.0
 };
 
-// 更新晃動效果
+//----------------------------------------------------------------------------------------------------
 function updateShake() {
-    shake.time += 0.05; // 較慢的時間增量
-    
-    // 計算晃動偏移
-    var offsetX = Math.sin(shake.time * shake.frequency) * shake.intensity;
-    var offsetY = Math.cos(shake.time * shake.frequency * 0.7) * shake.intensity;
-    var offsetZ = Math.sin(shake.time * shake.frequency * 1.3) * shake.intensity * 0.3;
-    
-    // 使用新的 movePlayerCamera API 直接移動相機
+    shake.time += 0.5;
+
+    const offsetX = Math.sin(shake.time * shake.frequency) * shake.intensity;
+    const offsetY = Math.cos(shake.time * shake.frequency * 0.7) * shake.intensity;
+    const offsetZ = Math.sin(shake.time * shake.frequency * 1.3) * shake.intensity * 0.3;
+
     try {
         game.movePlayerCamera(offsetX, offsetY, offsetZ);
     } catch (e) {

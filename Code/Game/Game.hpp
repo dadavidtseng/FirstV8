@@ -79,4 +79,7 @@ private:
     // 新增：JavaScript 狀態
     bool m_hasInitializedJS = false;
     bool m_hasRunJSTests    = false;
+
+    Vec3 m_originalPlayerPosition = Vec3(-2.f, 0.f, 1.f);  // 儲存原始位置
+    bool m_cameraShakeActive = false;                        // 追蹤震動狀態
 };
