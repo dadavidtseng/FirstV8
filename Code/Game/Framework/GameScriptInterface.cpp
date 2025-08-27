@@ -18,7 +18,7 @@
 GameScriptInterface::GameScriptInterface(Game* game)
     : m_game(game)
 {
-    if (!g_theGame)
+    if (!g_game)
     {
         ERROR_AND_DIE("GameScriptInterface: Game pointer cannot be null")
     }

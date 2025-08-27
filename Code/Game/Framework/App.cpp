@@ -24,15 +24,15 @@
 #include "Game/Subsystem/Light/LightSubsystem.hpp"
 
 //----------------------------------------------------------------------------------------------------
-App*                   g_theApp               = nullptr;       // Created and owned by Main_Windows.cpp
-AudioSystem*           g_theAudio             = nullptr;       // Created and owned by the App
-BitmapFont*            g_theBitmapFont        = nullptr;       // Created and owned by the App
-Game*                  g_theGame              = nullptr;       // Created and owned by the App
-Renderer*              g_theRenderer          = nullptr;       // Created and owned by the App
-RandomNumberGenerator* g_theRNG               = nullptr;       // Created and owned by the App
-Window*                g_theWindow            = nullptr;       // Created and owned by the App
-LightSubsystem*        g_theLightSubsystem    = nullptr;       // Created and owned by the App
-ResourceSubsystem*     g_theResourceSubsystem = nullptr;       // Created and owned by the App
+App*                   g_app               = nullptr;       // Created and owned by Main_Windows.cpp
+AudioSystem*           g_audio             = nullptr;       // Created and owned by the App
+BitmapFont*            g_bitmapFont        = nullptr;       // Created and owned by the App
+Game*                  g_game              = nullptr;       // Created and owned by the App
+Renderer*              g_renderer          = nullptr;       // Created and owned by the App
+RandomNumberGenerator* g_rng               = nullptr;       // Created and owned by the App
+Window*                g_window            = nullptr;       // Created and owned by the App
+LightSubsystem*        g_lightSubsystem    = nullptr;       // Created and owned by the App
+ResourceSubsystem*     g_resourceSubsystem = nullptr;       // Created and owned by the App
 
 //----------------------------------------------------------------------------------------------------
 STATIC bool App::m_isQuitting = false;
@@ -43,16 +43,16 @@ void App::Startup()
     //-Start-of-EventSystem---------------------------------------------------------------------------
 
     sEventSystemConfig constexpr sEventSystemConfig;
-    g_theEventSystem = new EventSystem(sEventSystemConfig);
-    g_theEventSystem->SubscribeEventCallbackFunction("OnCloseButtonClicked", OnCloseButtonClicked);
-    g_theEventSystem->SubscribeEventCallbackFunction("quit", OnCloseButtonClicked);
+    g_eventSystem = new EventSystem(sEventSystemConfig);
+    g_eventSystem->SubscribeEventCallbackFunction("OnCloseButtonClicked", OnCloseButtonClicked);
+    g_eventSystem->SubscribeEventCallbackFunction("quit", OnCloseButtonClicked);
 
     //-End-of-EventSystem-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     //-Start-of-InputSystem---------------------------------------------------------------------------
 
     sInputSystemConfig constexpr sInputSystemConfig;
-    g_theInput = new InputSystem(sInputSystemConfig);
+    g_input = new InputSystem(sInputSystemConfig);
 
     //-End-of-InputSystem-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -61,85 +61,84 @@ void App::Startup()
     sWindowConfig sWindowConfig;
     sWindowConfig.m_windowType  = eWindowType::WINDOWED;
     sWindowConfig.m_aspectRatio = 2.f;
-    sWindowConfig.m_inputSystem = g_theInput;
+    sWindowConfig.m_inputSystem = g_input;
     sWindowConfig.m_windowTitle = "FirstV8";
-    g_theWindow                 = new Window(sWindowConfig);
+    g_window                    = new Window(sWindowConfig);
 
     //-End-of-Window----------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     //-Start-of-Renderer------------------------------------------------------------------------------
 
     sRendererConfig sRendererConfig;
-    sRendererConfig.m_window = g_theWindow;
-    g_theRenderer            = new Renderer(sRendererConfig);
+    sRendererConfig.m_window = g_window;
+    g_renderer               = new Renderer(sRendererConfig);
 
     //-End-of-Renderer--------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     //-Start-of-DebugRender---------------------------------------------------------------------------
 
     sDebugRenderConfig sDebugRenderConfig;
-    sDebugRenderConfig.m_renderer = g_theRenderer;
+    sDebugRenderConfig.m_renderer = g_renderer;
     sDebugRenderConfig.m_fontName = "DaemonFont";
 
     //-End-of-DebugRender-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     //-Start-of-DevConsole----------------------------------------------------------------------------
 
-    m_devConsoleCamera = new Camera();
-
     sDevConsoleConfig devConsoleConfig;
-    devConsoleConfig.m_defaultRenderer = g_theRenderer;
+    devConsoleConfig.m_defaultRenderer = g_renderer;
     devConsoleConfig.m_defaultFontName = "DaemonFont";
+    m_devConsoleCamera                 = new Camera();
     devConsoleConfig.m_defaultCamera   = m_devConsoleCamera;
-    g_theDevConsole                    = new DevConsole(devConsoleConfig);
+    g_devConsole                    = new DevConsole(devConsoleConfig);
 
-    g_theDevConsole->AddLine(DevConsole::INFO_MAJOR, "Controls");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(Mouse) Aim");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(W/A)   Move");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(S/D)   Strafe");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(Q/E)   Roll");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(Z/C)   Elevate");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(Shift) Sprint");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(H)     Set Camera to Origin");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(1)     Spawn Line");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(2)     Spawn Point");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(3)     Spawn Wireframe Sphere");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(4)     Spawn Basis");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(5)     Spawn Billboard Text");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(6)     Spawn Wireframe Cylinder");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(7)     Add Message");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(~)     Toggle Dev Console");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(ESC)   Exit Game");
-    g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "(SPACE) Start Game");
+    g_devConsole->AddLine(DevConsole::INFO_MAJOR, "Controls");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(Mouse) Aim");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(W/A)   Move");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(S/D)   Strafe");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(Q/E)   Roll");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(Z/C)   Elevate");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(Shift) Sprint");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(H)     Set Camera to Origin");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(1)     Spawn Line");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(2)     Spawn Point");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(3)     Spawn Wireframe Sphere");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(4)     Spawn Basis");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(5)     Spawn Billboard Text");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(6)     Spawn Wireframe Cylinder");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(7)     Add Message");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(~)     Toggle Dev Console");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(ESC)   Exit Game");
+    g_devConsole->AddLine(DevConsole::INFO_MINOR, "(SPACE) Start Game");
 
     //-End-of-DevConsole------------------------------------------------------------------------------
-
+    //------------------------------------------------------------------------------------------------
     //-Start-of-LogSubsystem--------------------------------------------------------------------------
 
     sLogSubsystemConfig config;
-    config.logFilePath = "Logs/MyGame.log";        // 日誌檔案路徑
-    config.enableConsole = true;                   // 啟用控制台輸出
-    config.enableFile = true;                      // 啟用檔案輸出
-    config.enableDebugOut = true;                  // 啟用 Visual Studio 輸出
-    config.enableOnScreen = true;                  // 啟用螢幕輸出
+    config.logFilePath      = "Logs/MyGame.log";        // 日誌檔案路徑
+    config.enableConsole    = true;                   // 啟用控制台輸出
+    config.enableFile       = true;                      // 啟用檔案輸出
+    config.enableDebugOut   = true;                  // 啟用 Visual Studio 輸出
+    config.enableOnScreen   = true;                  // 啟用螢幕輸出
     config.enableDevConsole = true;                // 啟用開發者控制台輸出
-    config.asyncLogging = true;                    // 啟用非同步日誌
-    config.maxLogEntries = 50000;                  // 記憶體中最大日誌條目數
+    config.asyncLogging     = true;                    // 啟用非同步日誌
+    config.maxLogEntries    = 50000;                  // 記憶體中最大日誌條目數
     config.timestampEnabled = true;               // 啟用時間戳記
-    config.threadIdEnabled = true;                 // 啟用執行緒 ID
-    config.autoFlush = false;                      // 不自動重新整理（效能考量）
+    config.threadIdEnabled  = true;                 // 啟用執行緒 ID
+    config.autoFlush        = false;                      // 不自動重新整理（效能考量）
 
     // 建立並啟動日誌子系統
-    g_theLogSubsystem = new LogSubsystem(config);
+    g_logSubsystem = new LogSubsystem(config);
 
     //------------------------------------------------------------------------------------------------
     //-Start-of-AudioSystem---------------------------------------------------------------------------
 
     sAudioSystemConfig constexpr sAudioSystemConfig;
-    g_theAudio = new AudioSystem(sAudioSystemConfig);
+    g_audio = new AudioSystem(sAudioSystemConfig);
 
     sLightConfig constexpr lightConfig;
-    g_theLightSubsystem = new LightSubsystem(lightConfig);
+    g_lightSubsystem = new LightSubsystem(lightConfig);
 
     //-End-of-NetworkSubsystem------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -148,12 +147,10 @@ void App::Startup()
     sResourceSubsystemConfig resourceSubsystemConfig;
     resourceSubsystemConfig.m_threadCount = 4;
 
-    g_theResourceSubsystem = new ResourceSubsystem(resourceSubsystemConfig);
+    g_resourceSubsystem = new ResourceSubsystem(resourceSubsystemConfig);
 
     //-End-of-ResourceSubsystem-----------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
-
-
 
 
     //-Start-of-V8Subsystem---------------------------------------------------------------------------
@@ -162,30 +159,30 @@ void App::Startup()
     v8Config.enableDebugging     = true;
     v8Config.heapSizeLimit       = 256;
     v8Config.enableConsoleOutput = true;
-    g_theV8Subsystem             = new V8Subsystem(v8Config);
+    g_v8Subsystem             = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
 
-    g_theEventSystem->Startup();
-    g_theWindow->Startup();
-    g_theRenderer->Startup();
+    g_eventSystem->Startup();
+    g_window->Startup();
+    g_renderer->Startup();
     DebugRenderSystemStartup(sDebugRenderConfig);
-    g_theDevConsole->StartUp();
-    g_theLogSubsystem->Startup();
-    g_theInput->Startup();
-    g_theAudio->Startup();
-    g_theLightSubsystem->StartUp();
-    g_theResourceSubsystem->Startup();
-    g_theV8Subsystem->Startup();
+    g_devConsole->StartUp();
+    g_logSubsystem->Startup();
+    g_input->Startup();
+    g_audio->Startup();
+    g_lightSubsystem->StartUp();
+    g_resourceSubsystem->Startup();
+    g_v8Subsystem->Startup();
 
-    g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/DaemonFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
-    g_theRNG        = new RandomNumberGenerator();
-    g_theGame       = new Game();
+    g_bitmapFont = g_renderer->CreateOrGetBitmapFontFromFile("Data/Fonts/DaemonFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
+    g_rng        = new RandomNumberGenerator();
+    g_game       = new Game();
     SetupScriptingBindings();
-    g_theLogSubsystem->RegisterCategory("LogMyGame", eLogVerbosity::Log, eLogVerbosity::All);
-    g_theLogSubsystem->RegisterCategory("LogPlayerSystem", eLogVerbosity::Verbose, eLogVerbosity::All);
-    g_theLogSubsystem->RegisterCategory("LogPhysics", eLogVerbosity::Warning, eLogVerbosity::All);
+    g_logSubsystem->RegisterCategory("LogMyGame", eLogVerbosity::Log, eLogVerbosity::All);
+    g_logSubsystem->RegisterCategory("LogPlayerSystem", eLogVerbosity::Verbose, eLogVerbosity::All);
+    g_logSubsystem->RegisterCategory("LogPhysics", eLogVerbosity::Warning, eLogVerbosity::All);
     DAEMON_LOG(LogTemp, eLogVerbosity::Fatal, "A");
     // DAEMON_LOG(LogTemp, eLogVerbosity::Display, "A");
     // DAEMON_LOG(LogTemp, eLogVerbosity::Warning, "A");
@@ -199,36 +196,36 @@ void App::Shutdown()
     // 在其他清理程式碼之前新增：
     if (m_gameScriptInterface)
     {
-        if (g_theV8Subsystem)
+        if (g_v8Subsystem)
         {
-            g_theV8Subsystem->UnregisterScriptableObject("game");
+            g_v8Subsystem->UnregisterScriptableObject("game");
         }
         m_gameScriptInterface.reset();
     }
 
     // Destroy all Engine Subsystem
-    GAME_SAFE_RELEASE(g_theGame);
-    GAME_SAFE_RELEASE(g_theRNG);
-    GAME_SAFE_RELEASE(g_theBitmapFont);
+    GAME_SAFE_RELEASE(g_game);
+    GAME_SAFE_RELEASE(g_rng);
+    GAME_SAFE_RELEASE(g_bitmapFont);
 
-    g_theV8Subsystem->Shutdown();
-    g_theLightSubsystem->ShutDown();
-    g_theAudio->Shutdown();
-    g_theInput->Shutdown();
-    g_theDevConsole->Shutdown();
+    g_v8Subsystem->Shutdown();
+    g_lightSubsystem->ShutDown();
+    g_audio->Shutdown();
+    g_input->Shutdown();
+    g_devConsole->Shutdown();
 
     GAME_SAFE_RELEASE(m_devConsoleCamera);
 
     DebugRenderSystemShutdown();
-    g_theRenderer->Shutdown();
-    g_theWindow->Shutdown();
-    g_theEventSystem->Shutdown();
+    g_renderer->Shutdown();
+    g_window->Shutdown();
+    g_eventSystem->Shutdown();
 
-    GAME_SAFE_RELEASE(g_theV8Subsystem);
-    GAME_SAFE_RELEASE(g_theAudio);
-    GAME_SAFE_RELEASE(g_theRenderer);
-    GAME_SAFE_RELEASE(g_theWindow);
-    GAME_SAFE_RELEASE(g_theInput);
+    GAME_SAFE_RELEASE(g_v8Subsystem);
+    GAME_SAFE_RELEASE(g_audio);
+    GAME_SAFE_RELEASE(g_renderer);
+    GAME_SAFE_RELEASE(g_window);
+    GAME_SAFE_RELEASE(g_input);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -272,14 +269,14 @@ STATIC void App::RequestQuit()
 //----------------------------------------------------------------------------------------------------
 void App::BeginFrame() const
 {
-    g_theEventSystem->BeginFrame();
-    g_theWindow->BeginFrame();
-    g_theRenderer->BeginFrame();
+    g_eventSystem->BeginFrame();
+    g_window->BeginFrame();
+    g_renderer->BeginFrame();
     DebugRenderBeginFrame();
-    g_theDevConsole->BeginFrame();
-    g_theInput->BeginFrame();
-    g_theAudio->BeginFrame();
-    g_theLightSubsystem->BeginFrame();
+    g_devConsole->BeginFrame();
+    g_input->BeginFrame();
+    g_audio->BeginFrame();
+    g_lightSubsystem->BeginFrame();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -288,7 +285,7 @@ void App::Update()
     Clock::TickSystemClock();
     float deltaSeconds = Clock::GetSystemClock().GetDeltaSeconds();
     UpdateCursorMode();
-    g_theGame->Update();
+    g_game->Update();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -302,25 +299,25 @@ void App::Render() const
 {
     Rgba8 const clearColor = Rgba8::GREY;
 
-    g_theRenderer->ClearScreen(clearColor, Rgba8::BLACK);
-    g_theGame->Render();
+    g_renderer->ClearScreen(clearColor, Rgba8::BLACK);
+    g_game->Render();
 
     AABB2 const box = AABB2(Vec2::ZERO, Vec2(1600.f, 30.f));
 
-    g_theDevConsole->Render(box);
+    g_devConsole->Render(box);
 }
 
 //----------------------------------------------------------------------------------------------------
 void App::EndFrame() const
 {
-    g_theEventSystem->EndFrame();
-    g_theWindow->EndFrame();
-    g_theRenderer->EndFrame();
+    g_eventSystem->EndFrame();
+    g_window->EndFrame();
+    g_renderer->EndFrame();
     DebugRenderEndFrame();
-    g_theDevConsole->EndFrame();
-    g_theInput->EndFrame();
-    g_theAudio->EndFrame();
-    g_theLightSubsystem->EndFrame();
+    g_devConsole->EndFrame();
+    g_input->EndFrame();
+    g_audio->EndFrame();
+    g_lightSubsystem->EndFrame();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -333,9 +330,9 @@ STATIC std::any App::OnPrint(std::vector<std::any> const& args)
             std::string message = std::any_cast<std::string>(args[0]);
             DebuggerPrintf("JS: %s\n", message.c_str());
 
-            if (g_theDevConsole)
+            if (g_devConsole)
             {
-                g_theDevConsole->AddLine(DevConsole::INFO_MINOR, "JS: " + message);
+                g_devConsole->AddLine(DevConsole::INFO_MINOR, "JS: " + message);
             }
         }
         catch (std::bad_any_cast const&)
@@ -355,7 +352,7 @@ std::any App::OnDebug(std::vector<std::any> const& args)
             std::string message = std::any_cast<std::string>(args[0]);
             DebuggerPrintf("JS DEBUG: %s\n", message.c_str());
         }
-        catch ( std::bad_any_cast const&)
+        catch (std::bad_any_cast const&)
         {
             DebuggerPrintf("JS DEBUG: [無法轉換的物件]\n");
         }
@@ -366,9 +363,9 @@ std::any App::OnDebug(std::vector<std::any> const& args)
 std::any App::OnGarbageCollection(std::vector<std::any> const& args)
 {
     UNUSED(args)
-    if (g_theV8Subsystem)
+    if (g_v8Subsystem)
     {
-        g_theV8Subsystem->ForceGarbageCollection();
+        g_v8Subsystem->ForceGarbageCollection();
         DebuggerPrintf("JS: 垃圾回收已執行\n");
     }
     return std::any{};
@@ -377,30 +374,30 @@ std::any App::OnGarbageCollection(std::vector<std::any> const& args)
 //----------------------------------------------------------------------------------------------------
 void App::UpdateCursorMode()
 {
-    bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindow->GetWindowHandle();
-    bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || g_theGame->IsAttractMode();
+    bool const doesWindowHasFocus   = GetActiveWindow() == g_window->GetWindowHandle();
+    bool const shouldUsePointerMode = !doesWindowHasFocus || g_devConsole->IsOpen() || g_game->IsAttractMode();
 
     if (shouldUsePointerMode == true)
     {
-        g_theInput->SetCursorMode(eCursorMode::POINTER);
+        g_input->SetCursorMode(eCursorMode::POINTER);
     }
     else
     {
-        g_theInput->SetCursorMode(eCursorMode::FPS);
+        g_input->SetCursorMode(eCursorMode::FPS);
     }
 }
 
 void App::SetupScriptingBindings()
 {
-    if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized() && g_theGame)
+    if (g_v8Subsystem && g_v8Subsystem->IsInitialized() && g_game)
     {
         DebuggerPrintf("設定腳本綁定...\n");
 
-        m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_theGame);
-        g_theV8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
-        g_theV8Subsystem->RegisterGlobalFunction("print", OnPrint);
-        g_theV8Subsystem->RegisterGlobalFunction("debug", OnDebug);
-        g_theV8Subsystem->RegisterGlobalFunction("gc", OnGarbageCollection);
+        m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_game);
+        g_v8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
+        g_v8Subsystem->RegisterGlobalFunction("print", OnPrint);
+        g_v8Subsystem->RegisterGlobalFunction("debug", OnDebug);
+        g_v8Subsystem->RegisterGlobalFunction("gc", OnGarbageCollection);
 
         DebuggerPrintf("腳本綁定設定完成！\n");
     }

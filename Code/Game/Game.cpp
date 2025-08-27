@@ -102,7 +102,7 @@ void Game::Update()
     // 基本相機晃動更新
     static int shakeCounter = 0;
 
-    if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
+    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
         shakeCounter++;
 
@@ -118,7 +118,7 @@ void Game::Update()
     }
 
     // 新增：一次性 JavaScript 測試
-    if (!m_hasRunJSTests && g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
+    if (!m_hasRunJSTests && g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
         RunJavaScriptTests();
 
@@ -134,7 +134,7 @@ void Game::Render() const
 {
     //-Start-of-Game-Camera---------------------------------------------------------------------------
 
-    g_theRenderer->BeginCamera(*m_player->GetCamera());
+    g_renderer->BeginCamera(*m_player->GetCamera());
 
     if (m_gameState == eGameState::GAME)
     {
@@ -150,19 +150,19 @@ void Game::Render() const
         DebugAddScreenText(Stringf("WindowPosition=(%.1f,%.1f)", windowPosition.x, windowPosition.y), Vec2(0, 60), 20.f, Vec2::ZERO, 0.f);
         DebugAddScreenText(Stringf("ClientPosition=(%.1f,%.1f)", clientPosition.x, clientPosition.y), Vec2(0, 80), 20.f, Vec2::ZERO, 0.f);
         // 新增：JavaScript 狀態顯示
-        if (g_theV8Subsystem)
+        if (g_v8Subsystem)
         {
-            std::string jsStatus = g_theV8Subsystem->IsInitialized() ? "JS: 已啟用" : "JS: 未啟用";
+            std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS: 已啟用" : "JS: 未啟用";
             DebugAddScreenText(jsStatus, Vec2(0, 100), 20.f, Vec2::ZERO, 0.f);
 
-            if (g_theV8Subsystem->HasError())
+            if (g_v8Subsystem->HasError())
             {
-                DebugAddScreenText("JS錯誤: " + g_theV8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
+                DebugAddScreenText("JS錯誤: " + g_v8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
             }
         }
     }
 
-    g_theRenderer->EndCamera(*m_player->GetCamera());
+    g_renderer->EndCamera(*m_player->GetCamera());
 
     //-End-of-Game-Camera-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -173,14 +173,14 @@ void Game::Render() const
     //------------------------------------------------------------------------------------------------
     //-Start-of-Screen-Camera-------------------------------------------------------------------------
 
-    g_theRenderer->BeginCamera(*m_screenCamera);
+    g_renderer->BeginCamera(*m_screenCamera);
 
     if (m_gameState == eGameState::ATTRACT)
     {
         RenderAttractMode();
     }
 
-    g_theRenderer->EndCamera(*m_screenCamera);
+    g_renderer->EndCamera(*m_screenCamera);
 
     //-End-of-Screen-Camera---------------------------------------------------------------------------
     if (m_gameState == eGameState::GAME)
@@ -200,12 +200,12 @@ void Game::UpdateFromKeyBoard()
 {
     if (m_gameState == eGameState::ATTRACT)
     {
-        if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
+        if (g_input->WasKeyJustPressed(KEYCODE_ESC))
         {
             App::RequestQuit();
         }
 
-        if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
+        if (g_input->WasKeyJustPressed(KEYCODE_SPACE))
         {
             m_gameState = eGameState::GAME;
         }
@@ -213,36 +213,36 @@ void Game::UpdateFromKeyBoard()
 
     if (m_gameState == eGameState::GAME)
     {
-        if (g_theInput->WasKeyJustPressed(KEYCODE_G))
+        if (g_input->WasKeyJustPressed(KEYCODE_G))
         {
             DAEMON_LOG(LogTemp, eLogVerbosity::Warning, "G");
         }
-        if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
+        if (g_input->WasKeyJustPressed(KEYCODE_ESC))
         {
             m_gameState = eGameState::ATTRACT;
         }
 
-        if (g_theInput->WasKeyJustPressed(KEYCODE_P))
+        if (g_input->WasKeyJustPressed(KEYCODE_P))
         {
             m_gameClock->TogglePause();
         }
 
-        if (g_theInput->WasKeyJustPressed(KEYCODE_O))
+        if (g_input->WasKeyJustPressed(KEYCODE_O))
         {
             m_gameClock->StepSingleFrame();
         }
 
-        if (g_theInput->IsKeyDown(KEYCODE_T))
+        if (g_input->IsKeyDown(KEYCODE_T))
         {
             m_gameClock->SetTimeScale(0.1f);
         }
 
-        if (g_theInput->WasKeyJustReleased(KEYCODE_T))
+        if (g_input->WasKeyJustReleased(KEYCODE_T))
         {
             m_gameClock->SetTimeScale(1.f);
         }
 
-        if (g_theInput->WasKeyJustPressed(NUMCODE_1))
+        if (g_input->WasKeyJustPressed(NUMCODE_1))
         {
             Vec3 forward;
             Vec3 right;
@@ -252,12 +252,12 @@ void Game::UpdateFromKeyBoard()
             DebugAddWorldLine(m_player->m_position, m_player->m_position + forward * 20.f, 0.01f, 10.f, Rgba8(255, 255, 0), Rgba8(255, 255, 0), eDebugRenderMode::X_RAY);
         }
 
-        if (g_theInput->IsKeyDown(NUMCODE_2))
+        if (g_input->IsKeyDown(NUMCODE_2))
         {
             DebugAddWorldPoint(Vec3(m_player->m_position.x, m_player->m_position.y, 0.f), 0.25f, 60.f, Rgba8(150, 75, 0), Rgba8(150, 75, 0));
         }
 
-        if (g_theInput->WasKeyJustPressed(NUMCODE_3))
+        if (g_input->WasKeyJustPressed(NUMCODE_3))
         {
             Vec3 forward;
             Vec3 right;
@@ -267,12 +267,12 @@ void Game::UpdateFromKeyBoard()
             DebugAddWorldWireSphere(m_player->m_position + forward * 2.f, 1.f, 5.f, Rgba8::GREEN, Rgba8::RED);
         }
 
-        if (g_theInput->WasKeyJustPressed(NUMCODE_4))
+        if (g_input->WasKeyJustPressed(NUMCODE_4))
         {
             DebugAddWorldBasis(m_player->GetModelToWorldTransform(), 20.f);
         }
 
-        if (g_theInput->WasKeyJustReleased(NUMCODE_5))
+        if (g_input->WasKeyJustReleased(NUMCODE_5))
         {
             float const  positionX    = m_player->m_position.x;
             float const  positionY    = m_player->m_position.y;
@@ -290,13 +290,13 @@ void Game::UpdateFromKeyBoard()
             DebugAddBillboardText(text, m_player->m_position + forward, 0.1f, Vec2::HALF, 10.f, Rgba8::WHITE, Rgba8::RED);
         }
 
-        if (g_theInput->WasKeyJustPressed(NUMCODE_6))
+        if (g_input->WasKeyJustPressed(NUMCODE_6))
         {
             DebugAddWorldCylinder(m_player->m_position, m_player->m_position + Vec3::Z_BASIS * 2, 1.f, 10.f, true, Rgba8::WHITE, Rgba8::RED);
         }
 
 
-        if (g_theInput->WasKeyJustReleased(NUMCODE_7))
+        if (g_input->WasKeyJustReleased(NUMCODE_7))
         {
             float const orientationX = m_player->GetCamera()->GetOrientation().m_yawDegrees;
             float const orientationY = m_player->GetCamera()->GetOrientation().m_pitchDegrees;
@@ -312,7 +312,7 @@ void Game::UpdateFromKeyBoard()
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateFromController()
 {
-    XboxController const& controller = g_theInput->GetController(0);
+    XboxController const& controller = g_input->GetController(0);
 
     if (m_gameState == eGameState::ATTRACT)
     {
@@ -401,14 +401,14 @@ void Game::RenderAttractMode() const
 
     VertexList_PCU verts;
     AddVertsForDisc2D(verts, Vec2(clientDimensions.x * 0.5f, clientDimensions.y * 0.5f), 300.f, 10.f, Rgba8::YELLOW);
-    g_theRenderer->SetModelConstants();
-    g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
-    g_theRenderer->SetSamplerMode(eSamplerMode::BILINEAR_CLAMP);
-    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
-    g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
-    g_theRenderer->DrawVertexArray(verts);
+    g_renderer->SetModelConstants();
+    g_renderer->SetBlendMode(eBlendMode::OPAQUE);
+    g_renderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+    g_renderer->SetSamplerMode(eSamplerMode::BILINEAR_CLAMP);
+    g_renderer->SetDepthMode(eDepthMode::DISABLED);
+    g_renderer->BindTexture(nullptr);
+    g_renderer->BindShader(g_renderer->CreateOrGetShaderFromFile("Data/Shaders/Default"));
+    g_renderer->DrawVertexArray(verts);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -419,7 +419,7 @@ void Game::RenderEntities() const
     m_sphere->Render();
     m_grid->Render();
 
-    g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
+    g_renderer->SetModelConstants(m_player->GetModelToWorldTransform());
     m_player->Render();
 
     for (Prop* prop : m_props)
@@ -437,7 +437,7 @@ void Game::SpawnPlayer()
 //----------------------------------------------------------------------------------------------------
 void Game::SpawnProp()
 {
-    Texture const* texture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/TestUV.png");
+    Texture const* texture = g_renderer->CreateOrGetTextureFromFile("Data/Images/TestUV.png");
 
     m_firstCube  = new Prop(this);
     m_secondCube = new Prop(this);
@@ -462,22 +462,22 @@ void Game::SpawnProp()
 
 void Game::ExecuteJavaScriptCommand(const std::string& command)
 {
-    if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
+    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
         DebuggerPrintf("執行 JS 指令: %s\n", command.c_str());
-        bool success = g_theV8Subsystem->ExecuteScript(command);
+        bool success = g_v8Subsystem->ExecuteScript(command);
 
         if (!success)
         {
             DebuggerPrintf("JavaScript 指令執行失敗！\n");
-            if (g_theV8Subsystem->HasError())
+            if (g_v8Subsystem->HasError())
             {
-                DebuggerPrintf("錯誤: %s\n", g_theV8Subsystem->GetLastError().c_str());
+                DebuggerPrintf("錯誤: %s\n", g_v8Subsystem->GetLastError().c_str());
             }
         }
         else
         {
-            std::string result = g_theV8Subsystem->GetLastResult();
+            std::string result = g_v8Subsystem->GetLastResult();
             if (!result.empty())
             {
                 DebuggerPrintf("JS 結果: %s\n", result.c_str());
@@ -493,17 +493,17 @@ void Game::ExecuteJavaScriptCommand(const std::string& command)
 //----------------------------------------------------------------------------------------------------
 void Game::ExecuteJavaScriptFile(const std::string& filename)
 {
-    if (g_theV8Subsystem && g_theV8Subsystem->IsInitialized())
+    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
         DebuggerPrintf("執行 JS 檔案: %s\n", filename.c_str());
-        bool success = g_theV8Subsystem->ExecuteScriptFile(filename);
+        bool success = g_v8Subsystem->ExecuteScriptFile(filename);
 
         if (!success)
         {
             DebuggerPrintf("JavaScript 檔案執行失敗: %s\n", filename.c_str());
-            if (g_theV8Subsystem->HasError())
+            if (g_v8Subsystem->HasError())
             {
-                DebuggerPrintf("錯誤: %s\n", g_theV8Subsystem->GetLastError().c_str());
+                DebuggerPrintf("錯誤: %s\n", g_v8Subsystem->GetLastError().c_str());
             }
         }
     }
@@ -520,19 +520,19 @@ void Game::HandleJavaScriptCommands()
     // 這裡可以加入定期檢查 JavaScript 指令的邏輯
 
     // 範例：檢查特定按鍵來執行預設腳本
-    if (g_theInput->WasKeyJustPressed('J'))
+    if (g_input->WasKeyJustPressed('J'))
     {
         // ExecuteJavaScriptCommand("console.log('J 鍵觸發的 JavaScript!');");
         ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
     }
 
-    if (g_theInput->IsKeyDown('K'))
+    if (g_input->IsKeyDown('K'))
     {
         // ExecuteJavaScriptCommand("game.createCube(Math.random() * 10 - 5, 0, Math.random() * 10 - 5);");
         ExecuteJavaScriptCommand("game.moveProp(0, Math.random() * 10 - 5, 0, Math.random() * 10 - 5);");
     }
 
-    if (g_theInput->WasKeyJustPressed('L'))
+    if (g_input->WasKeyJustPressed('L'))
     {
         // ExecuteJavaScriptCommand("var pos = game.getPlayerPosition(); console.log('Player Position:', pos);");
         ExecuteJavaScriptCommand("debug('Player Position');");
@@ -549,9 +549,9 @@ void Game::CreateCube(Vec3 const& position)
     Prop* newCube       = new Prop(this);
     newCube->m_position = position;
     newCube->m_color    = Rgba8(
-        static_cast<unsigned char>(g_theRNG->RollRandomIntInRange(100, 255)),
-        static_cast<unsigned char>(g_theRNG->RollRandomIntInRange(100, 255)),
-        static_cast<unsigned char>(g_theRNG->RollRandomIntInRange(100, 255)),
+        static_cast<unsigned char>(g_rng->RollRandomIntInRange(100, 255)),
+        static_cast<unsigned char>(g_rng->RollRandomIntInRange(100, 255)),
+        static_cast<unsigned char>(g_rng->RollRandomIntInRange(100, 255)),
         255
     );
     newCube->InitializeLocalVertsForCube();
@@ -607,7 +607,7 @@ void Game::HandleConsoleCommands()
     // 處理開發者控制台的 JavaScript 指令
     // 這需要與 DevConsole 整合
 
-    if (g_theDevConsole && g_theDevConsole->IsOpen())
+    if (g_devConsole && g_devConsole->IsOpen())
     {
         // 檢查控制台輸入是否為 JavaScript 指令
         // 這裡需要實作具體的控制台輸入檢查邏輯
