@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Input/InputScriptInterface.hpp"
 #include "Game/Framework/GameScriptInterface.hpp"
 
 //-Forward-Declaration--------------------------------------------------------------------------------
@@ -18,6 +19,7 @@ class App
 public:
     App()  = default;
     ~App() = default;
+    void ExecuteJavaScriptFile(String const& filename);
     void Startup();
     void Shutdown();
     void RunFrame();
@@ -43,4 +45,5 @@ private:
 
     Camera*                              m_devConsoleCamera = nullptr;
     std::shared_ptr<GameScriptInterface> m_gameScriptInterface;
+    std::shared_ptr<InputScriptInterface> m_inputScriptInterface;
 };

@@ -37,6 +37,28 @@ ResourceSubsystem*     g_resourceSubsystem = nullptr;       // Created and owned
 //----------------------------------------------------------------------------------------------------
 STATIC bool App::m_isQuitting = false;
 
+void App::ExecuteJavaScriptFile(String const& filename)
+{
+    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
+    {
+        DebuggerPrintf("執行 JS 檔案: %s\n", filename.c_str());
+        bool success = g_v8Subsystem->ExecuteScriptFile(filename);
+
+        if (!success)
+        {
+            DebuggerPrintf("JavaScript 檔案執行失敗: %s\n", filename.c_str());
+            if (g_v8Subsystem->HasError())
+            {
+                DebuggerPrintf("錯誤: %s\n", g_v8Subsystem->GetLastError().c_str());
+            }
+        }
+    }
+    else
+    {
+        DebuggerPrintf("V8Subsystem 不可用，無法執行 JS 檔案: %s\n", filename.c_str());
+    }
+}
+
 //----------------------------------------------------------------------------------------------------
 void App::Startup()
 {
@@ -180,6 +202,7 @@ void App::Startup()
     g_rng        = new RandomNumberGenerator();
     g_game       = new Game();
     SetupScriptingBindings();
+    ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
     g_logSubsystem->RegisterCategory("LogMyGame", eLogVerbosity::Log, eLogVerbosity::All);
     g_logSubsystem->RegisterCategory("LogPlayerSystem", eLogVerbosity::Verbose, eLogVerbosity::All);
     g_logSubsystem->RegisterCategory("LogPhysics", eLogVerbosity::Warning, eLogVerbosity::All);
@@ -283,7 +306,6 @@ void App::BeginFrame() const
 void App::Update()
 {
     Clock::TickSystemClock();
-    float deltaSeconds = Clock::GetSystemClock().GetDeltaSeconds();
     UpdateCursorMode();
     g_game->Update();
 }
@@ -389,12 +411,17 @@ void App::UpdateCursorMode()
 
 void App::SetupScriptingBindings()
 {
+
+
     if (g_v8Subsystem && g_v8Subsystem->IsInitialized() && g_game)
     {
         DebuggerPrintf("設定腳本綁定...\n");
 
         m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_game);
         g_v8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
+        
+        m_inputScriptInterface = std::make_shared<InputScriptInterface>(g_input);
+        g_v8Subsystem->RegisterScriptableObject("input", m_inputScriptInterface);
         g_v8Subsystem->RegisterGlobalFunction("print", OnPrint);
         g_v8Subsystem->RegisterGlobalFunction("debug", OnDebug);
         g_v8Subsystem->RegisterGlobalFunction("gc", OnGarbageCollection);

@@ -33,7 +33,7 @@ public:
     ~Game();
 
     void Update();
-    void Render() const;
+    void Render() ;
     bool IsAttractMode() const;
 
     // 新增：JavaScript 相關功能
@@ -44,8 +44,10 @@ public:
     // 新增：JavaScript 回呼函數需要的遊戲功能
     void    CreateCube(const Vec3& position);
     void    MoveProp(int propIndex, const Vec3& newPosition);
-    void    MovePlayerCamera(const Vec3& offset);  // 新增：移動玩家相機
+    void    MovePlayerCamera(const Vec3& offset);
     Player* GetPlayer();
+    void Update(float gameDeltaSeconds, float systemDeltaSeconds);
+    void Render(float gameDeltaSeconds, float systemDeltaSeconds);
 
     // 新增：控制台命令處理
     void HandleConsoleCommands();

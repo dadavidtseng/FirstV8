@@ -54,6 +54,15 @@ std::vector<ScriptMethodInfo> GameScriptInterface::GetAvailableMethods() const
                          {"float", "float", "float"},
                          "string"),
 
+        ScriptMethodInfo("update",
+                         "JavaScript GameLoop Update",
+                         {},
+                         "void"),
+        ScriptMethodInfo("render",
+                         "JavaScript GameLoop Render",
+                         {},
+                         "void"),
+
         ScriptMethodInfo("executeCommand",
                          "執行 JavaScript 指令",
                          {"string"},
@@ -106,6 +115,14 @@ ScriptMethodResult GameScriptInterface::CallMethod(std::string const&           
         else if (methodName == "movePlayerCamera")
         {
             return ExecuteMovePlayerCamera(args);
+        }
+        else if (methodName == "update")
+        {
+            return ExecuteUpdate(args);
+        }
+        else if (methodName == "render")
+        {
+            return ExecuteRender(args);
         }
         else if (methodName == "executeCommand")
         {
@@ -220,8 +237,8 @@ ScriptMethodResult GameScriptInterface::ExecuteGetPlayerPosition(const std::vect
 
         // 回傳一個可以被 JavaScript 使用的物件
         std::string positionStr = "{ x: " + std::to_string(position.x) +
-            ", y: " + std::to_string(position.y) +
-            ", z: " + std::to_string(position.z) + " }";
+        ", y: " + std::to_string(position.y) +
+        ", z: " + std::to_string(position.z) + " }";
 
         return ScriptMethodResult::Success(positionStr);
     }
@@ -245,6 +262,42 @@ ScriptMethodResult GameScriptInterface::ExecuteMovePlayerCamera(const std::vecto
             std::to_string(offset.x) + ", " +
             std::to_string(offset.y) + ", " +
             std::to_string(offset.z) + ")"));
+    }
+    catch (const std::exception& e)
+    {
+        return ScriptMethodResult::Error("移動玩家相機失敗: " + std::string(e.what()));
+    }
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteRender(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 2, "Render");
+    if (!result.success) return result;
+
+    try
+    {
+        float gameDeltaSeconds   = ExtractFloat(args[0]);
+        float systemDeltaSeconds = ExtractFloat(args[1]);
+        m_game->Render(gameDeltaSeconds, systemDeltaSeconds);
+        return ScriptMethodResult::Success(Stringf("Render Success"));
+    }
+    catch (const std::exception& e)
+    {
+        return ScriptMethodResult::Error("移動玩家相機失敗: " + std::string(e.what()));
+    }
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteUpdate(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 2, "Update");
+    if (!result.success) return result;
+
+    try
+    {
+        float gameDeltaSeconds   = ExtractFloat(args[0]);
+        float systemDeltaSeconds = ExtractFloat(args[1]);
+        m_game->Update(gameDeltaSeconds, systemDeltaSeconds);
+        return ScriptMethodResult::Success(Stringf("Update Success"));
     }
     catch (const std::exception& e)
     {
@@ -461,7 +514,7 @@ ScriptMethodResult GameScriptInterface::ValidateArgCount(const std::vector<std::
     if (args.size() != expectedCount)
     {
         std::ostringstream oss;
-        oss << methodName << " 需要 " << expectedCount << " 個參數，但收到 " << args.size() << " 個";
+        oss << methodName << " needs " << expectedCount << " variables, but receives " << args.size();
         return ScriptMethodResult::Error(oss.str());
     }
     return ScriptMethodResult::Success();
@@ -476,7 +529,7 @@ ScriptMethodResult GameScriptInterface::ValidateArgCountRange(const std::vector<
     if (args.size() < minCount || args.size() > maxCount)
     {
         std::ostringstream oss;
-        oss << methodName << " 需要 " << minCount << "-" << maxCount << " 個參數，但收到 " << args.size() << " 個";
+        oss << methodName << " needs " << minCount << "-" << maxCount << " variables, but receives " << args.size();
         return ScriptMethodResult::Error(oss.str());
     }
     return ScriptMethodResult::Success();

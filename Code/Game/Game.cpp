@@ -65,12 +65,14 @@ Game::Game()
     // // 執行一些測試腳本
     // RunJavaScriptTests();
     // ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
+    g_logSubsystem->RegisterCategory("LogGame", eLogVerbosity::Verbose, eLogVerbosity::All);
+    DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::Game() start");
 }
 
 //----------------------------------------------------------------------------------------------------
 Game::~Game()
 {
-    DebuggerPrintf("遊戲關閉中...\n");
+    DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::~Game() start");
 
     m_props.clear();
 
@@ -82,111 +84,143 @@ Game::~Game()
     GAME_SAFE_RELEASE(m_player);
     GAME_SAFE_RELEASE(m_screenCamera);
 
-    DebuggerPrintf("遊戲關閉完成。\n");
+    DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::~Game() end");
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::Update()
 {
-    float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
-    float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
-
-    UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
-    UpdateFromKeyBoard();
-    UpdateFromController();
-
-    // 新增：JavaScript 相關更新
-    HandleJavaScriptCommands();
-    HandleConsoleCommands();
-
-    // 基本相機晃動更新
     static int shakeCounter = 0;
-
     if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
         shakeCounter++;
 
         if (shakeCounter >= 60)
         {
-            ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
+            // ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
             shakeCounter = 0;
         }
         if (shakeCounter >= 2)
         {
-            ExecuteJavaScriptCommand("updateShake();");
+            ExecuteJavaScriptCommand("update();");
         }
     }
-
-    // 新增：一次性 JavaScript 測試
-    if (!m_hasRunJSTests && g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    {
-        RunJavaScriptTests();
-
-        // 載入基本相機晃動
-        ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
-
-        m_hasRunJSTests = true;
-    }
+    // ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
+    // float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
+    // float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
+    //
+    // UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
+    // UpdateFromKeyBoard();
+    // UpdateFromController();
+    //
+    // // 新增：JavaScript 相關更新
+    // HandleJavaScriptCommands();
+    // HandleConsoleCommands();
+    //
+    // // 基本相機晃動更新
+    // static int shakeCounter = 0;
+    //
+    // if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
+    // {
+    //     shakeCounter++;
+    //
+    //     if (shakeCounter >= 60)
+    //     {
+    //         ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
+    //         shakeCounter = 0;
+    //     }
+    //     if (shakeCounter >= 2)
+    //     {
+    //         ExecuteJavaScriptCommand("updateShake();");
+    //     }
+    // }
+    //
+    // // 新增：一次性 JavaScript 測試
+    // if (!m_hasRunJSTests && g_v8Subsystem && g_v8Subsystem->IsInitialized())
+    // {
+    //     RunJavaScriptTests();
+    //
+    //     // 載入基本相機晃動
+    //     ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
+    //
+    //     m_hasRunJSTests = true;
+    // }
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::Render() const
+void Game::Render()
 {
-    //-Start-of-Game-Camera---------------------------------------------------------------------------
-
-    g_renderer->BeginCamera(*m_player->GetCamera());
-
-    if (m_gameState == eGameState::GAME)
+    ExecuteJavaScriptCommand("render();");
+    static int shakeCounter = 0;
+    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
-        RenderEntities();
-        Vec2 screenDimensions = Window::s_mainWindow->GetScreenDimensions();
-        Vec2 windowDimensions = Window::s_mainWindow->GetWindowDimensions();
-        Vec2 clientDimensions = Window::s_mainWindow->GetClientDimensions();
-        Vec2 windowPosition   = Window::s_mainWindow->GetWindowPosition();
-        Vec2 clientPosition   = Window::s_mainWindow->GetClientPosition();
-        DebugAddScreenText(Stringf("ScreenDimensions=(%.1f,%.1f)", screenDimensions.x, screenDimensions.y), Vec2(0, 0), 20.f, Vec2::ZERO, 0.f);
-        DebugAddScreenText(Stringf("WindowDimensions=(%.1f,%.1f)", windowDimensions.x, windowDimensions.y), Vec2(0, 20), 20.f, Vec2::ZERO, 0.f);
-        DebugAddScreenText(Stringf("ClientDimensions=(%.1f,%.1f)", clientDimensions.x, clientDimensions.y), Vec2(0, 40), 20.f, Vec2::ZERO, 0.f);
-        DebugAddScreenText(Stringf("WindowPosition=(%.1f,%.1f)", windowPosition.x, windowPosition.y), Vec2(0, 60), 20.f, Vec2::ZERO, 0.f);
-        DebugAddScreenText(Stringf("ClientPosition=(%.1f,%.1f)", clientPosition.x, clientPosition.y), Vec2(0, 80), 20.f, Vec2::ZERO, 0.f);
-        // 新增：JavaScript 狀態顯示
-        if (g_v8Subsystem)
-        {
-            std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS: 已啟用" : "JS: 未啟用";
-            DebugAddScreenText(jsStatus, Vec2(0, 100), 20.f, Vec2::ZERO, 0.f);
+        shakeCounter++;
 
-            if (g_v8Subsystem->HasError())
-            {
-                DebugAddScreenText("JS錯誤: " + g_v8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
-            }
+        if (shakeCounter >= 60)
+        {
+            // ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
+            shakeCounter = 0;
+        }
+        if (shakeCounter >= 1)
+        {
+            // ExecuteJavaScriptCommand("render();");
         }
     }
-
-    g_renderer->EndCamera(*m_player->GetCamera());
-
-    //-End-of-Game-Camera-----------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------
-    if (m_gameState == eGameState::GAME)
-    {
-        DebugRenderWorld(*m_player->GetCamera());
-    }
-    //------------------------------------------------------------------------------------------------
-    //-Start-of-Screen-Camera-------------------------------------------------------------------------
-
-    g_renderer->BeginCamera(*m_screenCamera);
-
-    if (m_gameState == eGameState::ATTRACT)
-    {
-        RenderAttractMode();
-    }
-
-    g_renderer->EndCamera(*m_screenCamera);
-
-    //-End-of-Screen-Camera---------------------------------------------------------------------------
-    if (m_gameState == eGameState::GAME)
-    {
-        DebugRenderScreen(*m_screenCamera);
-    }
+    // //-Start-of-Game-Camera---------------------------------------------------------------------------
+    //
+    // g_renderer->BeginCamera(*m_player->GetCamera());
+    //
+    // if (m_gameState == eGameState::GAME)
+    // {
+    //     RenderEntities();
+    //     Vec2 screenDimensions = Window::s_mainWindow->GetScreenDimensions();
+    //     Vec2 windowDimensions = Window::s_mainWindow->GetWindowDimensions();
+    //     Vec2 clientDimensions = Window::s_mainWindow->GetClientDimensions();
+    //     Vec2 windowPosition   = Window::s_mainWindow->GetWindowPosition();
+    //     Vec2 clientPosition   = Window::s_mainWindow->GetClientPosition();
+    //     DebugAddScreenText(Stringf("ScreenDimensions=(%.1f,%.1f)", screenDimensions.x, screenDimensions.y), Vec2(0, 0), 20.f, Vec2::ZERO, 0.f);
+    //     DebugAddScreenText(Stringf("WindowDimensions=(%.1f,%.1f)", windowDimensions.x, windowDimensions.y), Vec2(0, 20), 20.f, Vec2::ZERO, 0.f);
+    //     DebugAddScreenText(Stringf("ClientDimensions=(%.1f,%.1f)", clientDimensions.x, clientDimensions.y), Vec2(0, 40), 20.f, Vec2::ZERO, 0.f);
+    //     DebugAddScreenText(Stringf("WindowPosition=(%.1f,%.1f)", windowPosition.x, windowPosition.y), Vec2(0, 60), 20.f, Vec2::ZERO, 0.f);
+    //     DebugAddScreenText(Stringf("ClientPosition=(%.1f,%.1f)", clientPosition.x, clientPosition.y), Vec2(0, 80), 20.f, Vec2::ZERO, 0.f);
+    //     // 新增：JavaScript 狀態顯示
+    //     if (g_v8Subsystem)
+    //     {
+    //         std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS: 已啟用" : "JS: 未啟用";
+    //         DebugAddScreenText(jsStatus, Vec2(0, 100), 20.f, Vec2::ZERO, 0.f);
+    //
+    //         if (g_v8Subsystem->HasError())
+    //         {
+    //             DebugAddScreenText("JS錯誤: " + g_v8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
+    //         }
+    //     }
+    // }
+    //
+    // g_renderer->EndCamera(*m_player->GetCamera());
+    //
+    // //-End-of-Game-Camera-----------------------------------------------------------------------------
+    // //------------------------------------------------------------------------------------------------
+    // if (m_gameState == eGameState::GAME)
+    // {
+    //     DebugRenderWorld(*m_player->GetCamera());
+    // }
+    // //------------------------------------------------------------------------------------------------
+    // //-Start-of-Screen-Camera-------------------------------------------------------------------------
+    //
+    // g_renderer->BeginCamera(*m_screenCamera);
+    //
+    // if (m_gameState == eGameState::ATTRACT)
+    // {
+    //     RenderAttractMode();
+    // }
+    //
+    // g_renderer->EndCamera(*m_screenCamera);
+    //
+    // //-End-of-Screen-Camera---------------------------------------------------------------------------
+    // if (m_gameState == eGameState::GAME)
+    // {
+    //     DebugRenderScreen(*m_screenCamera);
+    // }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -455,39 +489,45 @@ void Game::SpawnProp()
     if (m_grid) m_props.push_back(m_grid);
 }
 
-
 //----------------------------------------------------------------------------------------------------
-// 新增的 JavaScript 相關方法
-//----------------------------------------------------------------------------------------------------
-
-void Game::ExecuteJavaScriptCommand(const std::string& command)
+void Game::ExecuteJavaScriptCommand(String const& command)
 {
-    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    {
-        DebuggerPrintf("執行 JS 指令: %s\n", command.c_str());
-        bool success = g_v8Subsystem->ExecuteScript(command);
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommand() start | %s", command.c_str()));
 
-        if (!success)
+    if (g_v8Subsystem == nullptr)
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommand() failed| %s | V8Subsystem is nullptr", command.c_str()));
+        return;
+    }
+
+    if (!g_v8Subsystem->IsInitialized())
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommand() failed| %s | V8Subsystem is not initialized", command.c_str()));
+        return;
+    }
+
+    bool const success = g_v8Subsystem->ExecuteScript(command);
+
+    if (success)
+    {
+        String const result = g_v8Subsystem->GetLastResult();
+
+        if (!result.empty())
         {
-            DebuggerPrintf("JavaScript 指令執行失敗！\n");
-            if (g_v8Subsystem->HasError())
-            {
-                DebuggerPrintf("錯誤: %s\n", g_v8Subsystem->GetLastError().c_str());
-            }
-        }
-        else
-        {
-            std::string result = g_v8Subsystem->GetLastResult();
-            if (!result.empty())
-            {
-                DebuggerPrintf("JS 結果: %s\n", result.c_str());
-            }
+            DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommand() result | %s", result.c_str()));
         }
     }
     else
     {
-        DebuggerPrintf("V8Subsystem 不可用，無法執行 JS 指令: %s\n", command.c_str());
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommand() failed"));
+
+        if (g_v8Subsystem->HasError())
+        {
+            DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommand() error | %s", g_v8Subsystem->GetLastError().c_str()));
+        }
     }
+
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommand() end | %s", command.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -582,6 +622,109 @@ Player* Game::GetPlayer()
     return m_player;
 }
 
+void Game::Update(float gameDeltaSeconds,
+                  float systemDeltaSeconds)
+{
+    gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
+    systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
+
+    UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
+    UpdateFromKeyBoard();
+    UpdateFromController();
+
+    // 新增：JavaScript 相關更新
+    HandleJavaScriptCommands();
+    HandleConsoleCommands();
+
+    // 基本相機晃動更新
+    static int shakeCounter = 0;
+
+    // if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
+    // {
+    //     shakeCounter++;
+    //
+    //     if (shakeCounter >= 60)
+    //     {
+    //         ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
+    //         shakeCounter = 0;
+    //     }
+    //     if (shakeCounter >= 2)
+    //     {
+    //         ExecuteJavaScriptCommand("updateShake();");
+    //     }
+    // }
+    //
+    // // 新增：一次性 JavaScript 測試
+    // if (!m_hasRunJSTests && g_v8Subsystem && g_v8Subsystem->IsInitialized())
+    // {
+    //     RunJavaScriptTests();
+    //
+    //     // 載入基本相機晃動
+    //     ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
+    //
+    //     m_hasRunJSTests = true;
+    // }
+}
+
+void Game::Render(float gameDeltaSeconds, float systemDeltaSeconds)
+{
+    //-Start-of-Game-Camera---------------------------------------------------------------------------
+
+    g_renderer->BeginCamera(*m_player->GetCamera());
+
+    if (m_gameState == eGameState::GAME)
+    {
+        RenderEntities();
+        Vec2 screenDimensions = Window::s_mainWindow->GetScreenDimensions();
+        Vec2 windowDimensions = Window::s_mainWindow->GetWindowDimensions();
+        Vec2 clientDimensions = Window::s_mainWindow->GetClientDimensions();
+        Vec2 windowPosition   = Window::s_mainWindow->GetWindowPosition();
+        Vec2 clientPosition   = Window::s_mainWindow->GetClientPosition();
+        DebugAddScreenText(Stringf("ScreenDimensions=(%.1f,%.1f)", screenDimensions.x, screenDimensions.y), Vec2(0, 0), 20.f, Vec2::ZERO, 0.f);
+        DebugAddScreenText(Stringf("WindowDimensions=(%.1f,%.1f)", windowDimensions.x, windowDimensions.y), Vec2(0, 20), 20.f, Vec2::ZERO, 0.f);
+        DebugAddScreenText(Stringf("ClientDimensions=(%.1f,%.1f)", clientDimensions.x, clientDimensions.y), Vec2(0, 40), 20.f, Vec2::ZERO, 0.f);
+        DebugAddScreenText(Stringf("WindowPosition=(%.1f,%.1f)", windowPosition.x, windowPosition.y), Vec2(0, 60), 20.f, Vec2::ZERO, 0.f);
+        DebugAddScreenText(Stringf("ClientPosition=(%.1f,%.1f)", clientPosition.x, clientPosition.y), Vec2(0, 80), 20.f, Vec2::ZERO, 0.f);
+        // 新增：JavaScript 狀態顯示
+        if (g_v8Subsystem)
+        {
+            std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS: 已啟用" : "JS: 未啟用";
+            DebugAddScreenText(jsStatus, Vec2(0, 100), 20.f, Vec2::ZERO, 0.f);
+
+            if (g_v8Subsystem->HasError())
+            {
+                DebugAddScreenText("JS錯誤: " + g_v8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
+            }
+        }
+    }
+
+    g_renderer->EndCamera(*m_player->GetCamera());
+
+    //-End-of-Game-Camera-----------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
+    if (m_gameState == eGameState::GAME)
+    {
+        DebugRenderWorld(*m_player->GetCamera());
+    }
+    //------------------------------------------------------------------------------------------------
+    //-Start-of-Screen-Camera-------------------------------------------------------------------------
+
+    g_renderer->BeginCamera(*m_screenCamera);
+
+    if (m_gameState == eGameState::ATTRACT)
+    {
+        RenderAttractMode();
+    }
+
+    g_renderer->EndCamera(*m_screenCamera);
+
+    //-End-of-Screen-Camera---------------------------------------------------------------------------
+    if (m_gameState == eGameState::GAME)
+    {
+        DebugRenderScreen(*m_screenCamera);
+    }
+}
+
 //----------------------------------------------------------------------------------------------------
 void Game::MovePlayerCamera(Vec3 const& offset)
 {
@@ -590,13 +733,13 @@ void Game::MovePlayerCamera(Vec3 const& offset)
         if (!m_cameraShakeActive)
         {
             m_originalPlayerPosition = m_player->m_position;
-            m_cameraShakeActive = true;
+            m_cameraShakeActive      = true;
             DebuggerPrintf("開始相機震動，原始位置: (%.3f, %.3f, %.3f)\n",
-                          m_originalPlayerPosition.x, m_originalPlayerPosition.y, m_originalPlayerPosition.z);
+                           m_originalPlayerPosition.x, m_originalPlayerPosition.y, m_originalPlayerPosition.z);
         }
 
         // 基於原始位置計算新位置（而不是當前位置）
-        Vec3 newPosition = m_originalPlayerPosition + offset;
+        Vec3 newPosition     = m_originalPlayerPosition + offset;
         m_player->m_position = newPosition;
     }
 }
