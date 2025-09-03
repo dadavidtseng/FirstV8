@@ -202,7 +202,7 @@ void App::Startup()
     g_rng        = new RandomNumberGenerator();
     g_game       = new Game();
     SetupScriptingBindings();
-    ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
+    g_game->PostInit();
     g_logSubsystem->RegisterCategory("LogMyGame", eLogVerbosity::Log, eLogVerbosity::All);
     g_logSubsystem->RegisterCategory("LogPlayerSystem", eLogVerbosity::Verbose, eLogVerbosity::All);
     g_logSubsystem->RegisterCategory("LogPhysics", eLogVerbosity::Warning, eLogVerbosity::All);

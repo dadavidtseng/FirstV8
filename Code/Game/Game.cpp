@@ -18,7 +18,6 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Resource/ResourceSubsystem.hpp"
 #include "Engine/Resource/Resource/ModelResource.hpp"
-#include "Engine/Resource/ResourceLoader/ObjModelLoader.hpp"
 #include "Engine/Scripting/V8Subsystem.hpp"
 #include "Game/Framework/App.hpp"
 #include "Game/Framework/GameCommon.hpp"
@@ -87,139 +86,51 @@ Game::~Game()
     DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::~Game() end");
 }
 
+
+void Game::PostInit()
+{
+    InitializeJavaScriptFramework();
+    m_hasInitializedJS = true;
+}
+
 //----------------------------------------------------------------------------------------------------
 void Game::Update()
 {
-    static int shakeCounter = 0;
-    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
+    // Temporarily disable JavaScript calls to test for buffer overrun
+    // Update JavaScript framework - this will call the actual C++ Update(float,float)
+    if (m_hasInitializedJS && g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
-        shakeCounter++;
-
-        if (shakeCounter >= 60)
-        {
-            // ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
-            shakeCounter = 0;
-        }
-        if (shakeCounter >= 2)
-        {
-            ExecuteJavaScriptCommand("update();");
-        }
+        float       deltaTimeMs = static_cast<float>(m_gameClock->GetDeltaSeconds() * 1000.0f);
+        std::string updateCmd   = "globalThis.JSEngine.update(" + std::to_string(deltaTimeMs) + ");";
+        ExecuteJavaScriptCommand(updateCmd);
     }
-    // ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
-    // float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
-    // float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
-    //
-    // UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
-    // UpdateFromKeyBoard();
-    // UpdateFromController();
-    //
-    // // 新增：JavaScript 相關更新
+    // else
+    // {
+    //     // // Fallback: call the overloaded update directly if JS framework isn't ready
+    //     // float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
+    //     // float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
+    //     // Update(gameDeltaSeconds, systemDeltaSeconds);
+    // }
+
+    // Handle additional JavaScript commands via keyboard
     // HandleJavaScriptCommands();
-    // HandleConsoleCommands();
-    //
-    // // 基本相機晃動更新
-    // static int shakeCounter = 0;
-    //
-    // if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    // {
-    //     shakeCounter++;
-    //
-    //     if (shakeCounter >= 60)
-    //     {
-    //         ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
-    //         shakeCounter = 0;
-    //     }
-    //     if (shakeCounter >= 2)
-    //     {
-    //         ExecuteJavaScriptCommand("updateShake();");
-    //     }
-    // }
-    //
-    // // 新增：一次性 JavaScript 測試
-    // if (!m_hasRunJSTests && g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    // {
-    //     RunJavaScriptTests();
-    //
-    //     // 載入基本相機晃動
-    //     ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
-    //
-    //     m_hasRunJSTests = true;
-    // }
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::Render()
 {
-    ExecuteJavaScriptCommand("render();");
-    static int shakeCounter = 0;
-    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
+    // Temporarily disable JavaScript calls to test for buffer overrun
+    // Render JavaScript framework - this will call the actual C++ Render(float,float)
+    if (m_hasInitializedJS && g_v8Subsystem && g_v8Subsystem->IsInitialized())
     {
-        shakeCounter++;
-
-        if (shakeCounter >= 60)
-        {
-            // ExecuteJavaScriptFile("Data/Scripts/gameLoop.js");
-            shakeCounter = 0;
-        }
-        if (shakeCounter >= 1)
-        {
-            // ExecuteJavaScriptCommand("render();");
-        }
+        ExecuteJavaScriptCommand("globalThis.JSEngine.render();");
     }
-    // //-Start-of-Game-Camera---------------------------------------------------------------------------
-    //
-    // g_renderer->BeginCamera(*m_player->GetCamera());
-    //
-    // if (m_gameState == eGameState::GAME)
+    // else
     // {
-    //     RenderEntities();
-    //     Vec2 screenDimensions = Window::s_mainWindow->GetScreenDimensions();
-    //     Vec2 windowDimensions = Window::s_mainWindow->GetWindowDimensions();
-    //     Vec2 clientDimensions = Window::s_mainWindow->GetClientDimensions();
-    //     Vec2 windowPosition   = Window::s_mainWindow->GetWindowPosition();
-    //     Vec2 clientPosition   = Window::s_mainWindow->GetClientPosition();
-    //     DebugAddScreenText(Stringf("ScreenDimensions=(%.1f,%.1f)", screenDimensions.x, screenDimensions.y), Vec2(0, 0), 20.f, Vec2::ZERO, 0.f);
-    //     DebugAddScreenText(Stringf("WindowDimensions=(%.1f,%.1f)", windowDimensions.x, windowDimensions.y), Vec2(0, 20), 20.f, Vec2::ZERO, 0.f);
-    //     DebugAddScreenText(Stringf("ClientDimensions=(%.1f,%.1f)", clientDimensions.x, clientDimensions.y), Vec2(0, 40), 20.f, Vec2::ZERO, 0.f);
-    //     DebugAddScreenText(Stringf("WindowPosition=(%.1f,%.1f)", windowPosition.x, windowPosition.y), Vec2(0, 60), 20.f, Vec2::ZERO, 0.f);
-    //     DebugAddScreenText(Stringf("ClientPosition=(%.1f,%.1f)", clientPosition.x, clientPosition.y), Vec2(0, 80), 20.f, Vec2::ZERO, 0.f);
-    //     // 新增：JavaScript 狀態顯示
-    //     if (g_v8Subsystem)
-    //     {
-    //         std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS: 已啟用" : "JS: 未啟用";
-    //         DebugAddScreenText(jsStatus, Vec2(0, 100), 20.f, Vec2::ZERO, 0.f);
-    //
-    //         if (g_v8Subsystem->HasError())
-    //         {
-    //             DebugAddScreenText("JS錯誤: " + g_v8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
-    //         }
-    //     }
-    // }
-    //
-    // g_renderer->EndCamera(*m_player->GetCamera());
-    //
-    // //-End-of-Game-Camera-----------------------------------------------------------------------------
-    // //------------------------------------------------------------------------------------------------
-    // if (m_gameState == eGameState::GAME)
-    // {
-    //     DebugRenderWorld(*m_player->GetCamera());
-    // }
-    // //------------------------------------------------------------------------------------------------
-    // //-Start-of-Screen-Camera-------------------------------------------------------------------------
-    //
-    // g_renderer->BeginCamera(*m_screenCamera);
-    //
-    // if (m_gameState == eGameState::ATTRACT)
-    // {
-    //     RenderAttractMode();
-    // }
-    //
-    // g_renderer->EndCamera(*m_screenCamera);
-    //
-    // //-End-of-Screen-Camera---------------------------------------------------------------------------
-    // if (m_gameState == eGameState::GAME)
-    // {
-    //     DebugRenderScreen(*m_screenCamera);
+    //     // // Fallback: call the overloaded render directly if JS framework isn't ready
+    //     // float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
+    //     // float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
+    //     // Render(gameDeltaSeconds, systemDeltaSeconds);
     // }
 }
 
@@ -625,6 +536,7 @@ Player* Game::GetPlayer()
 void Game::Update(float gameDeltaSeconds,
                   float systemDeltaSeconds)
 {
+    // Note: gameDeltaSeconds and systemDeltaSeconds are already passed in, don't recalculate
     gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
     systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
 
@@ -632,38 +544,9 @@ void Game::Update(float gameDeltaSeconds,
     UpdateFromKeyBoard();
     UpdateFromController();
 
-    // 新增：JavaScript 相關更新
+    // Note: HandleJavaScriptCommands is now called from the main Update() method
     HandleJavaScriptCommands();
     HandleConsoleCommands();
-
-    // 基本相機晃動更新
-    static int shakeCounter = 0;
-
-    // if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    // {
-    //     shakeCounter++;
-    //
-    //     if (shakeCounter >= 60)
-    //     {
-    //         ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
-    //         shakeCounter = 0;
-    //     }
-    //     if (shakeCounter >= 2)
-    //     {
-    //         ExecuteJavaScriptCommand("updateShake();");
-    //     }
-    // }
-    //
-    // // 新增：一次性 JavaScript 測試
-    // if (!m_hasRunJSTests && g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    // {
-    //     RunJavaScriptTests();
-    //
-    //     // 載入基本相機晃動
-    //     ExecuteJavaScriptFile("Data/Scripts/shakeCamera.js");
-    //
-    //     m_hasRunJSTests = true;
-    // }
 }
 
 void Game::Render(float gameDeltaSeconds, float systemDeltaSeconds)
@@ -805,4 +688,32 @@ void Game::RunJavaScriptTests()
     )");
 
     DebuggerPrintf("JavaScript 測試執行完成！\n");
+}
+
+//----------------------------------------------------------------------------------------------------
+void Game::InitializeJavaScriptFramework()
+{
+    DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::InitializeJavaScriptFramework() start");
+
+    if (!g_v8Subsystem || !g_v8Subsystem->IsInitialized())
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, "Game::InitializeJavaScriptFramework() failed - V8 not available");
+        return;
+    }
+
+    try
+    {
+        // Load the JavaScript framework files
+        DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading JSEngine.js...");
+        ExecuteJavaScriptFile("Data/Scripts/JSEngine.js");
+
+        DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading JSGame.js...");
+        ExecuteJavaScriptFile("Data/Scripts/JSGame.js");
+
+        DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::InitializeJavaScriptFramework() complete");
+    }
+    catch (...)
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, "Game::InitializeJavaScriptFramework() exception occurred");
+    }
 }
