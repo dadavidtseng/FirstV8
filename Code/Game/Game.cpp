@@ -403,7 +403,7 @@ void Game::SpawnProp()
 //----------------------------------------------------------------------------------------------------
 void Game::ExecuteJavaScriptCommand(String const& command)
 {
-    DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommand() start | %s", command.c_str()));
+    // DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommand() start | %s", command.c_str()));
 
     if (g_v8Subsystem == nullptr)
     {
@@ -438,7 +438,7 @@ void Game::ExecuteJavaScriptCommand(String const& command)
         }
     }
 
-    DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommand() end | %s", command.c_str()));
+    // DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommand() end | %s", command.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------
