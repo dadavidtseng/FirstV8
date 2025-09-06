@@ -27,6 +27,7 @@
 //----------------------------------------------------------------------------------------------------
 Game::Game()
 {
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::Game()"));
     SpawnPlayer();
     SpawnProp();
 

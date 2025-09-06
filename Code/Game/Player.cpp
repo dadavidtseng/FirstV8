@@ -5,13 +5,12 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Player.hpp"
 
-#include "Game.hpp"
-#include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Game/Game.hpp"
 
 //----------------------------------------------------------------------------------------------------
 Player::Player(Game* owner)
