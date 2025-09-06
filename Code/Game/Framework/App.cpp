@@ -138,7 +138,7 @@ void App::Startup()
     //-Start-of-LogSubsystem--------------------------------------------------------------------------
 
     sLogSubsystemConfig config;
-    config.logFilePath      = "Logs/MyGame.log";        // 日誌檔案路徑
+    config.logFilePath      = "Logs/FirstV8.log";        // 日誌檔案路徑
     config.enableConsole    = true;                   // 啟用控制台輸出
     config.enableFile       = true;                      // 啟用檔案輸出
     config.enableDebugOut   = true;                  // 啟用 Visual Studio 輸出
@@ -173,8 +173,6 @@ void App::Startup()
 
     //-End-of-ResourceSubsystem-----------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
-
-
     //-Start-of-V8Subsystem---------------------------------------------------------------------------
 
     sV8SubsystemConfig v8Config;
@@ -186,12 +184,12 @@ void App::Startup()
     //-End-of-V8Subsystem-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
 
+    g_logSubsystem->Startup();
     g_eventSystem->Startup();
     g_window->Startup();
     g_renderer->Startup();
     DebugRenderSystemStartup(sDebugRenderConfig);
     g_devConsole->StartUp();
-    g_logSubsystem->Startup();
     g_input->Startup();
     g_audio->Startup();
     g_lightSubsystem->StartUp();
