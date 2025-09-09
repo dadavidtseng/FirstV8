@@ -1,11 +1,17 @@
-// JSEngine.js - Simple JavaScript Engine Framework
+// JSEngine.js - Enhanced JavaScript Engine Framework with System Registration
 class JSEngine {
     constructor() {
         this.game = null;
         this.isInitialized = false;
         this.frameCount = 0;
         
-        console.log('JSEngine: Created');
+        // System Registration
+        this.registeredSystems = new Map();
+        this.updateSystems = [];
+        this.renderSystems = [];
+        this.pendingOperations = [];
+        
+        console.log('JSEngine: Created with system registration');
     }
 
     /**
@@ -26,35 +32,182 @@ class JSEngine {
         console.log('JSEngine: Game instance set');
     }
 
+    // ============================================================================
+    // SYSTEM REGISTRATION API (for AI agents and runtime modifications)
+    // ============================================================================
+    
+    /**
+     * Register a system for runtime execution
+     * @param {string} id - Unique system identifier
+     * @param {Object} config - System configuration
+     */
+    registerSystem(id, config = {}) {
+        if (!id || typeof id !== 'string') {
+            console.error('JSEngine: System ID must be a non-empty string');
+            return false;
+        }
+
+        const system = {
+            id: id,
+            update: config.update || null,
+            render: config.render || null,
+            priority: config.priority || 0,
+            enabled: config.enabled !== false,
+            data: config.data || {}
+        };
+
+        this.registeredSystems.set(id, system);
+        this.queueOperation({ type: 'register', system });
+        
+        console.log(`JSEngine: Registered system '${id}' (priority: ${system.priority})`);
+        return true;
+    }
+
+    /**
+     * Unregister a system
+     */
+    unregisterSystem(id) {
+        if (!this.registeredSystems.has(id)) {
+            console.warn(`JSEngine: System '${id}' not found`);
+            return false;
+        }
+
+        this.queueOperation({ type: 'unregister', id });
+        console.log(`JSEngine: Queued unregistration for system '${id}'`);
+        return true;
+    }
+
+    /**
+     * Enable or disable a system
+     */
+    setSystemEnabled(id, enabled) {
+        const system = this.registeredSystems.get(id);
+        if (!system) {
+            console.warn(`JSEngine: System '${id}' not found`);
+            return false;
+        }
+
+        system.enabled = enabled;
+        console.log(`JSEngine: System '${id}' ${enabled ? 'enabled' : 'disabled'}`);
+        return true;
+    }
+
+    /**
+     * Get system information
+     */
+    getSystem(id) {
+        return this.registeredSystems.get(id) || null;
+    }
+
+    /**
+     * List all registered systems
+     */
+    listSystems() {
+        return Array.from(this.registeredSystems.keys()).map(id => {
+            const sys = this.registeredSystems.get(id);
+            return {
+                id: sys.id,
+                enabled: sys.enabled,
+                priority: sys.priority,
+                hasUpdate: sys.update !== null,
+                hasRender: sys.render !== null
+            };
+        });
+    }
+
+    // ============================================================================
+    // INTERNAL SYSTEM MANAGEMENT
+    // ============================================================================
+
+    queueOperation(operation) {
+        this.pendingOperations.push(operation);
+    }
+
+    processOperations() {
+        for (const op of this.pendingOperations) {
+            if (op.type === 'register') {
+                this.addSystemToLists(op.system);
+            } else if (op.type === 'unregister') {
+                this.removeSystemFromLists(op.id);
+            }
+        }
+        this.pendingOperations = [];
+    }
+
+    addSystemToLists(system) {
+        if (system.update && typeof system.update === 'function') {
+            this.updateSystems.push(system);
+            this.updateSystems.sort((a, b) => a.priority - b.priority);
+        }
+
+        if (system.render && typeof system.render === 'function') {
+            this.renderSystems.push(system);
+            this.renderSystems.sort((a, b) => a.priority - b.priority);
+        }
+
+        console.log(`JSEngine: System '${system.id}' added to execution lists`);
+    }
+
+    removeSystemFromLists(id) {
+        this.updateSystems = this.updateSystems.filter(sys => sys.id !== id);
+        this.renderSystems = this.renderSystems.filter(sys => sys.id !== id);
+        this.registeredSystems.delete(id);
+        
+        console.log(`JSEngine: System '${id}' removed from all lists`);
+    }
+
     /**
      * Update method - called by C++ engine
-     * This calls the game's update method
+     * Now processes both game and registered systems
      */
     update(deltaTime) {
-        if (!this.isInitialized || !this.game) {
+        if (!this.isInitialized) {
             return;
         }
         
         this.frameCount++;
+        this.processOperations();
         
-        // Call the game's update method first
-        if (this.game.update) {
+        // FIRST: Call the original game's update method (maintains compatibility)
+        if (this.game && this.game.update) {
             this.game.update(deltaTime);
+        }
+        
+        // THEN: Execute all registered update systems
+        for (const system of this.updateSystems) {
+            if (system.enabled && system.update) {
+                try {
+                    system.update(deltaTime);
+                } catch (error) {
+                    console.error(`JSEngine: Error in system '${system.id}' update:`, error);
+                }
+            }
         }
     }
 
     /**
      * Render method - called by C++ engine
-     * This calls the game's render method
+     * Now processes both game and registered systems
      */
     render() {
-        if (!this.isInitialized || !this.game) {
+        if (!this.isInitialized) {
             return;
         }
         
-        // Call the game's render method first
-        if (this.game.render) {
+        // FIRST: Call the original game's render method (maintains compatibility)
+        if (this.game && this.game.render) {
             this.game.render();
+        }
+        
+        // THEN: Execute all registered render systems
+        for (const system of this.renderSystems) {
+            if (system.enabled && system.render) {
+                try {
+                    system.render();
+                } catch (error) {
+                    console.error(`JSEngine: Error in system '${system.id}' render:`, error);
+                }
+            }
         }
     }
 
@@ -121,13 +274,17 @@ class JSEngine {
     }
 
     /**
-     * Get engine status
+     * Get engine status (enhanced with system registration info)
      */
     getStatus() {
         return {
             isInitialized: this.isInitialized,
             hasGame: this.game !== null,
-            frameCount: this.frameCount
+            frameCount: this.frameCount,
+            systemCount: this.registeredSystems.size,
+            updateSystemCount: this.updateSystems.length,
+            renderSystemCount: this.renderSystems.length,
+            pendingOperations: this.pendingOperations.length
         };
     }
 }
