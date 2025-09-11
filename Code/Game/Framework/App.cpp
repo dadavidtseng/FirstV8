@@ -179,6 +179,11 @@ void App::Startup()
     v8Config.enableDebugging     = true;
     v8Config.heapSizeLimit       = 256;
     v8Config.enableConsoleOutput = true;
+    // Chrome DevTools Inspector Configuration
+    v8Config.enableInspector     = true;  // Enable Chrome DevTools integration
+    v8Config.inspectorPort       = 9229;  // Chrome DevTools connection port
+    v8Config.inspectorHost       = "127.0.0.1"; // Inspector server bind address
+    v8Config.waitForDebugger     = false; // Don't pause execution waiting for debugger
     g_v8Subsystem                = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem-----------------------------------------------------------------------------

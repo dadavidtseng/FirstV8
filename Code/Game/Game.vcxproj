@@ -172,7 +172,7 @@
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8-v143-x64.13.0.245.25\lib\Debug\</AdditionalLibraryDirectories>
             <!-- Additional V8 dependencies not covered by props -->
-            <AdditionalDependencies>winmm.lib;v8.dll.lib;v8_libbase.dll.lib;v8_libplatform.dll.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>winmm.lib;v8.dll.lib;v8_libbase.dll.lib;v8_libplatform.dll.lib;dbghelp.lib;shlwapi.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
             <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8.redist-v143-x64.13.0.245.25\lib\Debug\*.dll" "$(SolutionDir)Run\"</Command>
@@ -200,7 +200,7 @@
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8-v143-x64.13.0.245.25\lib\Release\</AdditionalLibraryDirectories>
             <!-- Additional V8 dependencies not covered by props -->
-            <AdditionalDependencies>winmm.lib;v8.dll.lib;v8_libbase.dll.lib;v8_libplatform.dll.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>winmm.lib;v8.dll.lib;v8_libbase.dll.lib;v8_libplatform.dll.lib;dbghelp.lib;shlwapi.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
             <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8.redist-v143-x64.13.0.245.25\lib\Release\*.dll" "$(SolutionDir)Run\"</Command>
