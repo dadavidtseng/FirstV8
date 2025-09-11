@@ -63,8 +63,7 @@ private:
     void SpawnPlayer();
     void SpawnProp();
 
-    // 新增：JavaScript 測試和除錯
-    void RunJavaScriptTests();
+
     void SetupJavaScriptBindings();
     void InitializeJavaScriptFramework();
 

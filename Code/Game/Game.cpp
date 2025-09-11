@@ -61,11 +61,6 @@ Game::Game()
     transform.SetIJKT3D(-Vec3::X_BASIS, Vec3::Z_BASIS, Vec3::Y_BASIS, Vec3(0.f, -0.25f, 0.25f));
     DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f, Rgba8::BLUE);
 
-
-    // // 執行一些測試腳本
-    // RunJavaScriptTests();
-    // ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
-    g_logSubsystem->RegisterCategory("LogGame", eLogVerbosity::Verbose, eLogVerbosity::All);
     DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::Game() start");
 }
 
@@ -654,41 +649,6 @@ void Game::HandleConsoleCommands()
         }
         */
     }
-}
-
-//----------------------------------------------------------------------------------------------------
-void Game::RunJavaScriptTests()
-{
-    DebuggerPrintf("開始執行 JavaScript 測試...\n");
-
-    // 基本功能測試
-    ExecuteJavaScriptCommand("console.log('=== JavaScript 功能測試開始 ===');");
-
-    // 數學運算測試
-    ExecuteJavaScriptCommand("var result = 10 + 5 * 2; console.log('數學測試: 10 + 5 * 2 =', result);");
-
-    // 遊戲物件互動測試
-    ExecuteJavaScriptCommand("console.log('取得玩家位置:', game.getPlayerPos());");
-
-    // 建立物件測試
-    ExecuteJavaScriptCommand("game.createCube(3, 0, 3); console.log('已建立測試方塊');");
-
-    // 移動物件測試（移動第一個物件）
-    if (!m_props.empty())
-    {
-        ExecuteJavaScriptCommand("game.moveProp(0, 2, 1, 2); console.log('已移動第一個物件');");
-    }
-
-    // 複雜腳本測試
-    ExecuteJavaScriptCommand(R"(
-        for(var i = 0; i < 3; i++) {
-            game.createCube(i * 2, 0, 5);
-            console.log('建立方塊', i + 1);
-        }
-        console.log('=== JavaScript 功能測試完成 ===');
-    )");
-
-    DebuggerPrintf("JavaScript 測試執行完成！\n");
 }
 
 //----------------------------------------------------------------------------------------------------
