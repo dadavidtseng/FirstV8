@@ -112,7 +112,7 @@ void App::Startup()
     devConsoleConfig.m_defaultFontName = "DaemonFont";
     m_devConsoleCamera                 = new Camera();
     devConsoleConfig.m_defaultCamera   = m_devConsoleCamera;
-    g_devConsole                    = new DevConsole(devConsoleConfig);
+    g_devConsole                       = new DevConsole(devConsoleConfig);
 
     g_devConsole->AddLine(DevConsole::INFO_MAJOR, "Controls");
     g_devConsole->AddLine(DevConsole::INFO_MINOR, "(Mouse) Aim");
@@ -179,7 +179,7 @@ void App::Startup()
     v8Config.enableDebugging     = true;
     v8Config.heapSizeLimit       = 256;
     v8Config.enableConsoleOutput = true;
-    g_v8Subsystem             = new V8Subsystem(v8Config);
+    g_v8Subsystem                = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
@@ -196,17 +196,14 @@ void App::Startup()
     g_resourceSubsystem->Startup();
     g_v8Subsystem->Startup();
 
+    g_logSubsystem->RegisterCategory("LogApp", eLogVerbosity::Log, eLogVerbosity::All);
+    g_logSubsystem->RegisterCategory("LogGame", eLogVerbosity::Log, eLogVerbosity::All);
+
     g_bitmapFont = g_renderer->CreateOrGetBitmapFontFromFile("Data/Fonts/DaemonFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
     g_rng        = new RandomNumberGenerator();
     g_game       = new Game();
     SetupScriptingBindings();
     g_game->PostInit();
-    g_logSubsystem->RegisterCategory("LogMyGame", eLogVerbosity::Log, eLogVerbosity::All);
-    g_logSubsystem->RegisterCategory("LogPlayerSystem", eLogVerbosity::Verbose, eLogVerbosity::All);
-    g_logSubsystem->RegisterCategory("LogPhysics", eLogVerbosity::Warning, eLogVerbosity::All);
-    DAEMON_LOG(LogTemp, eLogVerbosity::Fatal, "A");
-    // DAEMON_LOG(LogTemp, eLogVerbosity::Display, "A");
-    // DAEMON_LOG(LogTemp, eLogVerbosity::Warning, "A");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -409,25 +406,20 @@ void App::UpdateCursorMode()
 
 void App::SetupScriptingBindings()
 {
+    if (g_v8Subsystem == nullptr)ERROR_AND_DIE(StringFormat("(App::SetupScriptingBindings)(g_v8Subsystem is nullptr!"))
+    if (!g_v8Subsystem->IsInitialized())ERROR_AND_DIE(StringFormat("(App::SetupScriptingBindings)(g_v8Subsystem is not initialized!"))
+    if (g_game == nullptr)ERROR_AND_DIE(StringFormat("(App::SetupScriptingBindings)(g_game is nullptr"))
 
+    DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("(App::SetupScriptingBindings)(start)"));
 
-    if (g_v8Subsystem && g_v8Subsystem->IsInitialized() && g_game)
-    {
-        DebuggerPrintf("設定腳本綁定...\n");
+    m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_game);
+    g_v8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
+    m_inputScriptInterface = std::make_shared<InputScriptInterface>(g_input);
+    g_v8Subsystem->RegisterScriptableObject("input", m_inputScriptInterface);
 
-        m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_game);
-        g_v8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
-        
-        m_inputScriptInterface = std::make_shared<InputScriptInterface>(g_input);
-        g_v8Subsystem->RegisterScriptableObject("input", m_inputScriptInterface);
-        g_v8Subsystem->RegisterGlobalFunction("print", OnPrint);
-        g_v8Subsystem->RegisterGlobalFunction("debug", OnDebug);
-        g_v8Subsystem->RegisterGlobalFunction("gc", OnGarbageCollection);
+    g_v8Subsystem->RegisterGlobalFunction("print", OnPrint);
+    g_v8Subsystem->RegisterGlobalFunction("debug", OnDebug);
+    g_v8Subsystem->RegisterGlobalFunction("gc", OnGarbageCollection);
 
-        DebuggerPrintf("腳本綁定設定完成！\n");
-    }
-    else
-    {
-        DebuggerPrintf("警告：無法設定腳本綁定\n");
-    }
+    DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("(App::SetupScriptingBindings)(end)"));
 }
