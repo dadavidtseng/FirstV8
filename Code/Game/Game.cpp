@@ -24,6 +24,10 @@
 #include "Game/Player.hpp"
 #include "Game/Prop.hpp"
 
+// File operations for ExecuteJavaScriptFileForDebug
+#include <fstream>
+#include <sstream>
+
 //----------------------------------------------------------------------------------------------------
 Game::Game()
 {
@@ -438,6 +442,119 @@ void Game::ExecuteJavaScriptCommand(String const& command)
 }
 
 //----------------------------------------------------------------------------------------------------
+void Game::ExecuteJavaScriptCommandForDebug(String const& command, String const& scriptName)
+{
+    // Execute JavaScript command with Chrome DevTools integration for debugging
+    // This method registers the script so it appears in DevTools Sources panel
+    
+    if (g_v8Subsystem == nullptr)
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommandForDebug() failed| %s | V8Subsystem is nullptr", command.c_str()));
+        return;
+    }
+
+    if (!g_v8Subsystem->IsInitialized())
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommandForDebug() failed| %s | V8Subsystem is not initialized", command.c_str()));
+        return;
+    }
+
+    // Use the registered script execution method for Chrome DevTools debugging
+    bool const success = g_v8Subsystem->ExecuteRegisteredScript(command, scriptName);
+
+    if (success)
+    {
+        String const result = g_v8Subsystem->GetLastResult();
+
+        if (!result.empty())
+        {
+            DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptCommandForDebug() result | %s", result.c_str()));
+        }
+    }
+    else
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommandForDebug() failed"));
+
+        if (g_v8Subsystem->HasError())
+        {
+            DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommandForDebug() error | %s", g_v8Subsystem->GetLastError().c_str()));
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+void Game::ExecuteJavaScriptFileForDebug(String const& filename)
+{
+    // Load JavaScript file and execute it with Chrome DevTools integration for debugging
+    // This method reads a script file and registers it so it appears in DevTools Sources panel
+    
+    if (g_v8Subsystem == nullptr)
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptFileForDebug() failed| %s | V8Subsystem is nullptr", filename.c_str()));
+        return;
+    }
+
+    if (!g_v8Subsystem->IsInitialized())
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptFileForDebug() failed| %s | V8Subsystem is not initialized", filename.c_str()));
+        return;
+    }
+
+    // Read the script file content
+    std::string fullPath = filename;
+    std::ifstream file(fullPath);
+    
+    if (!file.is_open())
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptFileForDebug() failed to open file: %s", filename.c_str()));
+        return;
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string scriptContent = buffer.str();
+    file.close();
+
+    if (scriptContent.empty())
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Warning, Stringf("Game::ExecuteJavaScriptFileForDebug() file is empty: %s", filename.c_str()));
+        return;
+    }
+
+    // Extract just the filename for the script name in DevTools
+    std::string scriptName = filename;
+    size_t lastSlash = scriptName.find_last_of("/\\");
+    if (lastSlash != std::string::npos)
+    {
+        scriptName = scriptName.substr(lastSlash + 1);
+    }
+
+    DAEMON_LOG(LogGame, eLogVerbosity::Display, Stringf("Game::ExecuteJavaScriptFileForDebug() executing %s for Chrome DevTools debugging", filename.c_str()));
+
+    // Use the registered script execution method for Chrome DevTools debugging
+    bool const success = g_v8Subsystem->ExecuteRegisteredScript(scriptContent, scriptName);
+
+    if (success)
+    {
+        String const result = g_v8Subsystem->GetLastResult();
+
+        if (!result.empty())
+        {
+            DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::ExecuteJavaScriptFileForDebug() result | %s", result.c_str()));
+        }
+    }
+    else
+    {
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptFileForDebug() failed"));
+
+        if (g_v8Subsystem->HasError())
+        {
+            DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptFileForDebug() error | %s", g_v8Subsystem->GetLastError().c_str()));
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
 void Game::ExecuteJavaScriptFile(const std::string& filename)
 {
     if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
@@ -484,6 +601,13 @@ void Game::HandleJavaScriptCommands()
         // ExecuteJavaScriptCommand("var pos = game.getPlayerPosition(); console.log('Player Position:', pos);");
         ExecuteJavaScriptCommand("debug('Player Position');");
         // ExecuteJavaScriptCommand("console.log('這是真的 JavaScript 輸出！'); 42;");
+    }
+
+    // SCRIPT REGISTRY: F2 Key - Register for Chrome DevTools debugging  
+    if (g_input->WasKeyJustPressed(VK_F2))
+    {
+        // Load and execute F1 handler script from file for Chrome DevTools debugging
+        ExecuteJavaScriptFileForDebug("Data/Scripts/F1_KeyHandler.js");
     }
 }
 

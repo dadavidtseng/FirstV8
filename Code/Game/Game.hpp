@@ -41,6 +41,10 @@ public:
     void ExecuteJavaScriptCommand(const std::string& command);
     void ExecuteJavaScriptFile(const std::string& filename);
     void HandleJavaScriptCommands();
+    
+    // SCRIPT REGISTRY: Chrome DevTools selective integration
+    void ExecuteJavaScriptCommandForDebug(const std::string& command, const std::string& scriptName);
+    void ExecuteJavaScriptFileForDebug(const std::string& filename);
 
     // 新增：JavaScript 回呼函數需要的遊戲功能
     void    CreateCube(const Vec3& position);
