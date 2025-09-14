@@ -37,28 +37,6 @@ ResourceSubsystem*     g_resourceSubsystem = nullptr;       // Created and owned
 //----------------------------------------------------------------------------------------------------
 STATIC bool App::m_isQuitting = false;
 
-void App::ExecuteJavaScriptFile(String const& filename)
-{
-    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    {
-        DebuggerPrintf("執行 JS 檔案: %s\n", filename.c_str());
-        bool success = g_v8Subsystem->ExecuteScriptFile(filename);
-
-        if (!success)
-        {
-            DebuggerPrintf("JavaScript 檔案執行失敗: %s\n", filename.c_str());
-            if (g_v8Subsystem->HasError())
-            {
-                DebuggerPrintf("錯誤: %s\n", g_v8Subsystem->GetLastError().c_str());
-            }
-        }
-    }
-    else
-    {
-        DebuggerPrintf("V8Subsystem 不可用，無法執行 JS 檔案: %s\n", filename.c_str());
-    }
-}
-
 //----------------------------------------------------------------------------------------------------
 void App::Startup()
 {
@@ -138,7 +116,7 @@ void App::Startup()
     //-Start-of-LogSubsystem--------------------------------------------------------------------------
 
     sLogSubsystemConfig config;
-    config.logFilePath      = "Logs/FirstV8.log";        // 日誌檔案路徑
+    config.logFilePath      = "Log/FirstV8.log";        // 日誌檔案路徑
     config.enableConsole    = true;                   // 啟用控制台輸出
     config.enableFile       = true;                      // 啟用檔案輸出
     config.enableDebugOut   = true;                  // 啟用 Visual Studio 輸出

@@ -24,14 +24,13 @@
 #include "Game/Player.hpp"
 #include "Game/Prop.hpp"
 
-// File operations for ExecuteJavaScriptFileForDebug
 #include <fstream>
 #include <sstream>
 
 //----------------------------------------------------------------------------------------------------
 Game::Game()
 {
-    DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("Game::Game()"));
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, Stringf("(Game::Game)(start)"));
     SpawnPlayer();
     SpawnProp();
 
@@ -65,7 +64,7 @@ Game::Game()
     transform.SetIJKT3D(-Vec3::X_BASIS, Vec3::Z_BASIS, Vec3::Y_BASIS, Vec3(0.f, -0.25f, 0.25f));
     DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f, Rgba8::BLUE);
 
-    DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::Game() start");
+    DAEMON_LOG(LogGame, eLogVerbosity::Display, "(Game::Game)(end)");
 }
 
 //----------------------------------------------------------------------------------------------------
