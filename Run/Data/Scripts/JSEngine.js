@@ -43,7 +43,8 @@ class JSEngine {
      */
     registerSystem(id, config = {}) {
         if (!id || typeof id !== 'string') {
-            console.error('JSEngine: System ID must be a non-empty string');
+            // console.error('JSEngine: System ID must be a non-empty string');
+            console.log('JSEngine: System ID must be a non-empty string');
             return false;
         }
 
@@ -179,7 +180,8 @@ class JSEngine {
                 try {
                     system.update(deltaTime);
                 } catch (error) {
-                    console.error(`JSEngine: Error in system '${system.id}' update:`, error);
+                    console.log(`JSEngine: Error in system '${system.id}' update:`, error);
+                    // console.error(`JSEngine: Error in system '${system.id}' update:`, error);
                 }
             }
         }
@@ -205,7 +207,8 @@ class JSEngine {
                 try {
                     system.render();
                 } catch (error) {
-                    console.error(`JSEngine: Error in system '${system.id}' render:`, error);
+                    console.log(`JSEngine: Error in system '${system.id}' render:`, error);
+                    // console.error(`JSEngine: Error in system '${system.id}' render:`, error);
                 }
             }
         }
