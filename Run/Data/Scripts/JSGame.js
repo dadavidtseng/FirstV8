@@ -73,16 +73,16 @@ class JSGame {
             }
         });
 
-        // Register Status Logger System
-        this.engine.registerSystem('statusLogger', {
-            update: (deltaTime) => this.updateStatusLogger(deltaTime),
-            priority: 100,
-            data: {
-                description: 'Logs status every 10 seconds',
-                lastLogFrame: 0,
-                interval: 600
-            }
-        });
+        // Register Status Logger System (DISABLED - causes spam)
+        // this.engine.registerSystem('statusLogger', {
+        //     update: (deltaTime) => this.updateStatusLogger(deltaTime),
+        //     priority: 100,
+        //     data: {
+        //         description: 'Logs status every 10 seconds (DISABLED)',
+        //         lastLogFrame: 0,
+        //         interval: 600
+        //     }
+        // });
 
         console.log('JSGame: All systems registered with engine');
     }
@@ -162,11 +162,11 @@ class JSGame {
 
         // Log render info occasionally
         if (this.frameCount % 600 === 0) {
-            console.log('JSGame: Render called - frame ' + this.frameCount + ', shouldRender=' + shouldRenderValue);
+            // console.log('JSGame: Render called - frame ' + this.frameCount + ', shouldRender=' + shouldRenderValue);
         }
 
         if (!shouldRenderValue) {
-            console.log('JSGame: Rendering skipped due to F1 toggle');
+            // console.log('JSGame: Rendering skipped due to F1 toggle');
         }
     }
 
@@ -199,7 +199,7 @@ class JSGame {
 
         // Log input system status occasionally
         if (this.frameCount % 300 === 0) {
-            console.log('JSGame: Input system active, F1 detection enabled');
+            // console.log('JSGame: Input system active, F1 detection enabled');
         }
     }
 
@@ -243,9 +243,12 @@ class JSGame {
     }
 
     /**
-     * Status Logger System
+     * Status Logger System (DISABLED)
      */
     updateStatusLogger(deltaTime) {
+        // DISABLED - This system was causing console spam
+        // Enable only for debugging if needed
+        /*
         const system = this.engine.getSystem('statusLogger');
         if (!system) return;
 
@@ -253,6 +256,7 @@ class JSGame {
             this.logStatus();
             system.data.lastLogFrame = this.frameCount;
         }
+        */
     }
 
     /**
@@ -293,6 +297,9 @@ class JSGame {
     }
 
     logStatus() {
+        // DISABLED - This method was causing spam in the console
+        // Uncomment for debugging if needed
+        /*
         console.log('=== JSGame Status ===');
         console.log('Frame Count: ' + this.frameCount);
         console.log('Elapsed Time: ' + this.elapsedTime.toFixed(2) + 's');
@@ -312,6 +319,7 @@ class JSGame {
                 console.log(`  - ${sys.id}: ${sys.enabled ? 'enabled' : 'DISABLED'} (priority: ${sys.priority})`);
             });
         }
+        */
     }
 }
 
