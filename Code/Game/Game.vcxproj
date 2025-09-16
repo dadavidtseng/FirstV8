@@ -27,11 +27,11 @@
         <ProjectName>FirstV8</ProjectName>
     </PropertyGroup>
 
-    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+    <Import Project="$(VCTargetsPath)/Microsoft.Cpp.Default.props"/>
 
     <!-- V8 Package Imports - Automatic V8 Configuration -->
-    <Import Project="C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8-v143-x64.13.0.245.25\build\native\v8-v143-x64.props" />
-    <Import Project="C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8.redist-v143-x64.13.0.245.25\build\native\v8.redist-v143-x64.props" />
+    <Import Project="$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/build/native/v8-v143-x64.props"/>
+    <Import Project="$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/build/native/v8.redist-v143-x64.props"/>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
         <ConfigurationType>Application</ConfigurationType>
@@ -60,47 +60,55 @@
         <CharacterSet>Unicode</CharacterSet>
     </PropertyGroup>
 
-    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+    <Import Project="$(VCTargetsPath)/Microsoft.Cpp.props"/>
 
     <ImportGroup Label="ExtensionSettings">
     </ImportGroup>
     <ImportGroup Label="Shared">
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
     </ImportGroup>
 
-    <PropertyGroup Label="UserMacros" />
+    <PropertyGroup Label="UserMacros"/>
 
     <!-- Output directly to Temporary folder - PostBuildEvent will copy executable to Run -->
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-        <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
-        <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+        <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
+        <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
         <TargetName>$(ProjectName)_$(Configuration)_$(PlatformShortName)</TargetName>
+        <LocalDebuggerCommand>$(TargetFileName)</LocalDebuggerCommand>
+        <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-        <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
-        <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+        <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
+        <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
         <TargetName>$(ProjectName)_$(Configuration)_$(PlatformShortName)</TargetName>
+        <LocalDebuggerCommand>$(TargetFileName)</LocalDebuggerCommand>
+        <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
-        <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+        <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
+        <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
         <TargetName>$(ProjectName)_$(Configuration)_$(PlatformShortName)</TargetName>
+        <LocalDebuggerCommand>$(TargetFileName)</LocalDebuggerCommand>
+        <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
-        <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+        <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
+        <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
         <TargetName>$(ProjectName)_$(Configuration)_$(PlatformShortName)</TargetName>
+        <LocalDebuggerCommand>$(TargetFileName)</LocalDebuggerCommand>
+        <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
 
     <!-- Simplified ItemDefinitionGroups - V8 props files handle the V8 dependencies -->
@@ -112,15 +120,16 @@
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20 </AdditionalOptions>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
             <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-            <!-- Additional V8 dependencies not covered by props -->
-            <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <!-- V8 dependencies for Win32 Debug -->
+            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
             <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
@@ -138,8 +147,9 @@
             <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20 </AdditionalOptions>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
             <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -147,8 +157,8 @@
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-            <!-- Additional V8 dependencies not covered by props -->
-            <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <!-- V8 dependencies for Win32 Release -->
+            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
             <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
@@ -164,18 +174,18 @@
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20 </AdditionalOptions>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
             <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8-v143-x64.13.0.245.25\lib\Debug\</AdditionalLibraryDirectories>
-            <!-- Additional V8 dependencies not covered by props -->
-            <AdditionalDependencies>winmm.lib;v8.dll.lib;v8_libbase.dll.lib;v8_libplatform.dll.lib;dbghelp.lib;shlwapi.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/lib/Debug/;</AdditionalLibraryDirectories>
+            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
-            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8.redist-v143-x64.13.0.245.25\lib\Debug\*.dll" "$(SolutionDir)Run\"</Command>
+            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/lib/Debug/*.dll" "$(SolutionDir)Run/"</Command>
             <Message>Copying $(TargetFileName) and V8 Debug DLLs to $(SolutionDir)Run...</Message>
         </PostBuildEvent>
     </ItemDefinitionGroup>
@@ -190,27 +200,27 @@
             <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20 </AdditionalOptions>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
             <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8-v143-x64.13.0.245.25\lib\Release\</AdditionalLibraryDirectories>
-            <!-- Additional V8 dependencies not covered by props -->
-            <AdditionalDependencies>winmm.lib;v8.dll.lib;v8_libbase.dll.lib;v8_libplatform.dll.lib;dbghelp.lib;shlwapi.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/lib/Release/;</AdditionalLibraryDirectories>
+            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
         <PostBuildEvent>
-            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "C:\p4\Personal\SD\Engine\Code\ThirdParty\packages\v8.redist-v143-x64.13.0.245.25\lib\Release\*.dll" "$(SolutionDir)Run\"</Command>
+            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/lib/Release/*.dll" "$(SolutionDir)Run/"</Command>
             <Message>Copying $(TargetFileName) and V8 Release DLLs to $(SolutionDir)Run...</Message>
         </PostBuildEvent>
     </ItemDefinitionGroup>
 
     <!-- Project References -->
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Engine\Code\Engine\Engine.vcxproj">
+        <ProjectReference Include="../../../Engine/Code/Engine/Engine.vcxproj">
             <Project>{d80656f3-b024-489f-b7b3-8bf35b25c423}</Project>
         </ProjectReference>
     </ItemGroup>
@@ -227,36 +237,36 @@
 
     <!-- Source Files -->
     <ItemGroup>
-        <ClCompile Include="Entity.cpp" />
-        <ClCompile Include="Framework\App.cpp" />
-        <ClCompile Include="Framework\GameCommon.cpp" />
-        <ClCompile Include="Framework\GameScriptInterface.cpp" />
-        <ClCompile Include="Framework\Main_Windows.cpp" />
-        <ClCompile Include="Game.cpp" />
-        <ClCompile Include="Player.cpp" />
-        <ClCompile Include="Prop.cpp" />
-        <ClCompile Include="Subsystem\Light\LightSubsystem.cpp" />
+        <ClCompile Include="Entity.cpp"/>
+        <ClCompile Include="Framework/App.cpp"/>
+        <ClCompile Include="Framework/GameCommon.cpp"/>
+        <ClCompile Include="Framework/GameScriptInterface.cpp"/>
+        <ClCompile Include="Framework/Main_Windows.cpp"/>
+        <ClCompile Include="Game.cpp"/>
+        <ClCompile Include="Player.cpp"/>
+        <ClCompile Include="Prop.cpp"/>
+        <ClCompile Include="Subsystem/Light/LightSubsystem.cpp"/>
     </ItemGroup>
 
     <!-- Header Files -->
     <ItemGroup>
-        <ClInclude Include="EngineBuildPreferences.hpp" />
-        <ClInclude Include="Entity.hpp" />
-        <ClInclude Include="Framework\App.hpp" />
-        <ClInclude Include="Framework\GameCommon.hpp" />
-        <ClInclude Include="Framework\GameScriptInterface.hpp" />
-        <ClInclude Include="Game.hpp" />
-        <ClInclude Include="Player.hpp" />
-        <ClInclude Include="Prop.hpp" />
-        <ClInclude Include="Subsystem\Light\LightSubsystem.hpp" />
+        <ClInclude Include="EngineBuildPreferences.hpp"/>
+        <ClInclude Include="Entity.hpp"/>
+        <ClInclude Include="Framework/App.hpp"/>
+        <ClInclude Include="Framework/GameCommon.hpp"/>
+        <ClInclude Include="Framework/GameScriptInterface.hpp"/>
+        <ClInclude Include="Game.hpp"/>
+        <ClInclude Include="Player.hpp"/>
+        <ClInclude Include="Prop.hpp"/>
+        <ClInclude Include="Subsystem/Light/LightSubsystem.hpp"/>
     </ItemGroup>
 
     <!-- Other Files -->
     <ItemGroup>
-        <None Include="..\..\Docs\README.md" />
+        <None Include="../../Docs/README.md"/>
     </ItemGroup>
 
-    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+    <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">
     </ImportGroup>
 </Project>
