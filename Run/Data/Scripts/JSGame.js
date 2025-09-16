@@ -6,7 +6,9 @@ class JSGame {
         this.frameCount = 0;
         this.testCounter = 0;
 
-        console.log('JSGame: Game instance created');
+        // Create InputSystem instance for delegation (AI Agent file separation)
+        this.inputSystem = new InputSystem();
+        console.log('JSGame: Game instance created with InputSystem delegation');
         
         // Register individual game systems
         this.registerGameSystems();
@@ -29,13 +31,13 @@ class JSGame {
             data: { description: 'C++ engine bridge system' }
         });
 
-        // Register Input System (demonstrable - can be enabled/disabled)
+        // Register Input System (delegated to InputSystem.js for AI Agent separation)
         this.engine.registerSystem('inputHandler', {
             update: (deltaTime) => this.updateInputHandler(deltaTime),
             priority: 10,
             enabled: true,
             data: {
-                description: 'F1 key handler and other input',
+                description: 'F1 key handler delegated to InputSystem for AI Agent editing',
                 lastF1State: false
             }
         });
@@ -171,35 +173,21 @@ class JSGame {
     }
 
     /**
-     * Input Handler System - can be enabled/disabled for demo
+     * Input Handler System - delegated to InputSystem.js for AI Agent file separation
      */
     updateInputHandler(deltaTime) {
         const system = this.engine.getSystem('inputHandler');
         if (!system) return;
 
-        // Handle F1 key for render toggle (preserve original logic)
-        let currentF1State = false;
-        if (typeof input !== 'undefined' && input.wasKeyJustPressed) {
-            currentF1State = input.wasKeyJustPressed(112); // F1 key code
-        }
-
-        // Edge detection for F1 key
-        if (currentF1State && !system.data.lastF1State) {
-            if (typeof shouldRender !== 'undefined') {
-                shouldRender = !shouldRender;
-                console.log('JSGame: F1 pressed via INPUT SYSTEM, shouldRender =', shouldRender);
-            } else if (typeof globalThis.shouldRender !== 'undefined') {
-                globalThis.shouldRender = !globalThis.shouldRender;
-                console.log('JSGame: F1 pressed via INPUT SYSTEM, globalThis.shouldRender =', globalThis.shouldRender);
-            } else {
-                console.log('JSGame: F1 pressed but shouldRender variable not found!');
-            }
-        }
-        system.data.lastF1State = currentF1State;
+        // Delegate input handling to InputSystem (AI Agent separation)
+        this.inputSystem.handleInput(deltaTime);
+        
+        // Update system data from InputSystem for consistency
+        system.data.lastF1State = this.inputSystem.getLastF1State();
 
         // Log input system status occasionally
         if (this.frameCount % 300 === 0) {
-            // console.log('JSGame: Input system active, F1 detection enabled');
+            // console.log('JSGame: Input system active, delegated to InputSystem.js');
         }
     }
 
