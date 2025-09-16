@@ -5,6 +5,8 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Framework/App.hpp"
 
+#include <chrono>
+
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/DevConsole.hpp"
@@ -33,6 +35,7 @@ RandomNumberGenerator* g_rng               = nullptr;       // Created and owned
 Window*                g_window            = nullptr;       // Created and owned by the App
 LightSubsystem*        g_lightSubsystem    = nullptr;       // Created and owned by the App
 ResourceSubsystem*     g_resourceSubsystem = nullptr;       // Created and owned by the App
+V8Subsystem*           g_v8Subsystem       = nullptr;
 
 //----------------------------------------------------------------------------------------------------
 STATIC bool App::m_isQuitting = false;
@@ -116,7 +119,7 @@ void App::Startup()
     //-Start-of-LogSubsystem--------------------------------------------------------------------------
 
     sLogSubsystemConfig config;
-    config.logFilePath      = "Log/FirstV8.log";        // 日誌檔案路徑
+    config.logFilePath      = "Logs/FirstV8.log";        // 日誌檔案路徑
     config.enableConsole    = true;                   // 啟用控制台輸出
     config.enableFile       = true;                      // 啟用檔案輸出
     config.enableDebugOut   = true;                  // 啟用 Visual Studio 輸出
@@ -128,7 +131,18 @@ void App::Startup()
     config.threadIdEnabled  = true;                 // 啟用執行緒 ID
     config.autoFlush        = false;                      // 不自動重新整理（效能考量）
 
-    // 建立並啟動日誌子系統
+    // Enhanced smart rotation settings
+    config.enableSmartRotation = true;               // 啟用智能日誌輪轉 (Minecraft-style)
+    config.rotationConfigPath  = "Data/Config/LogRotation.json"; // 輪轉配置檔案路徑
+
+    // Configure Minecraft-style rotation settings
+    config.smartRotationConfig.maxFileSizeBytes  = 100 * 1024 * 1024;  // 100MB per file
+    config.smartRotationConfig.maxTimeInterval   = std::chrono::hours(2); // 2 hours max per segment
+    // config.smartRotationConfig.enableCompression = true;                // Enable .gz compression
+    config.smartRotationConfig.logDirectory      = "Logs";                   // Log directory
+    config.smartRotationConfig.currentLogName    = "latest.log";           // Current session log
+    config.smartRotationConfig.sessionPrefix     = "session";               // Archive prefix
+
     g_logSubsystem = new LogSubsystem(config);
 
     //------------------------------------------------------------------------------------------------
@@ -158,11 +172,11 @@ void App::Startup()
     v8Config.heapSizeLimit       = 256;
     v8Config.enableConsoleOutput = true;
     // Chrome DevTools Inspector Configuration
-    v8Config.enableInspector     = true;  // Enable Chrome DevTools integration
-    v8Config.inspectorPort       = 9229;  // Chrome DevTools connection port
-    v8Config.inspectorHost       = "127.0.0.1"; // Inspector server bind address
-    v8Config.waitForDebugger     = false; // Don't pause execution waiting for debugger
-    g_v8Subsystem                = new V8Subsystem(v8Config);
+    v8Config.enableInspector = true;  // Enable Chrome DevTools integration
+    v8Config.inspectorPort   = 9229;  // Chrome DevTools connection port
+    v8Config.inspectorHost   = "127.0.0.1"; // Inspector server bind address
+    v8Config.waitForDebugger = false; // Don't pause execution waiting for debugger
+    g_v8Subsystem            = new V8Subsystem(v8Config);
 
     //-End-of-V8Subsystem-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------

@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 
+#include "Engine/Core/StringUtils.hpp"
+
 struct Vertex_PCUTBN;
 class ModelResource;
 
@@ -38,25 +40,26 @@ public:
     bool IsAttractMode() const;
 
     // 新增：JavaScript 相關功能
-    void ExecuteJavaScriptCommand(const std::string& command);
-    void ExecuteJavaScriptFile(const std::string& filename);
+    void ExecuteJavaScriptCommand(String const& command);
+    void ExecuteJavaScriptFile(String const& filename);
     void HandleJavaScriptCommands();
-    
+
     // SCRIPT REGISTRY: Chrome DevTools selective integration
     void ExecuteJavaScriptCommandForDebug(const std::string& command, const std::string& scriptName);
     void ExecuteJavaScriptFileForDebug(const std::string& filename);
 
     // 新增：JavaScript 回呼函數需要的遊戲功能
-    void    CreateCube(const Vec3& position);
-    void    MoveProp(int propIndex, const Vec3& newPosition);
-    void    MovePlayerCamera(const Vec3& offset);
+    void    CreateCube(Vec3 const& position);
+    void    MoveProp(int propIndex, Vec3 const& newPosition);
+    void    MovePlayerCamera(Vec3 const& offset);
     Player* GetPlayer();
     void    Update(float gameDeltaSeconds, float systemDeltaSeconds);
     void    Render(float gameDeltaSeconds, float systemDeltaSeconds);
 
     // 新增：控制台命令處理
-    void HandleConsoleCommands();
-    Clock*     m_gameClock    = nullptr;
+    void   HandleConsoleCommands();
+    Clock* m_gameClock = nullptr;
+
 private:
     void UpdateFromKeyBoard();
     void UpdateFromController();
@@ -71,14 +74,14 @@ private:
     void SetupJavaScriptBindings();
     void InitializeJavaScriptFramework();
 
-    Camera*    m_screenCamera = nullptr;
-    Player*    m_player       = nullptr;
-    Prop*      m_firstCube    = nullptr;
-    Prop*      m_secondCube   = nullptr;
-    Prop*      m_sphere       = nullptr;
-    Prop*      m_grid         = nullptr;
+    Camera* m_screenCamera = nullptr;
+    Player* m_player       = nullptr;
+    Prop*   m_firstCube    = nullptr;
+    Prop*   m_secondCube   = nullptr;
+    Prop*   m_sphere       = nullptr;
+    Prop*   m_grid         = nullptr;
 
-    eGameState m_gameState    = eGameState::ATTRACT;
+    eGameState m_gameState = eGameState::ATTRACT;
 
     // 新增：物件管理
     std::vector<Prop*> m_props;  // 用於 JavaScript 管理的物件清單

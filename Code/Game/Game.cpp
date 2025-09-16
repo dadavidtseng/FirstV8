@@ -64,13 +64,13 @@ Game::Game()
     transform.SetIJKT3D(-Vec3::X_BASIS, Vec3::Z_BASIS, Vec3::Y_BASIS, Vec3(0.f, -0.25f, 0.25f));
     DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f, Rgba8::BLUE);
 
-    DAEMON_LOG(LogGame, eLogVerbosity::Display, "(Game::Game)(end)");
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, "(Game::Game)(end)");
 }
 
 //----------------------------------------------------------------------------------------------------
 Game::~Game()
 {
-    DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::~Game() start");
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, "(Game::~Game)(start)");
 
     m_props.clear();
 
@@ -406,13 +406,13 @@ void Game::ExecuteJavaScriptCommand(String const& command)
 
     if (g_v8Subsystem == nullptr)
     {
-        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommand() failed| %s | V8Subsystem is nullptr", command.c_str()));
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("(Game::ExecuteJavaScriptCommand)(failed)(g_v8Subsystem is nullptr!)"));
         return;
     }
 
     if (!g_v8Subsystem->IsInitialized())
     {
-        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommand() failed| %s | V8Subsystem is not initialized", command.c_str()));
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("(Game::ExecuteJavaScriptCommand) failed| %s | V8Subsystem is not initialized", command.c_str()));
         return;
     }
 
@@ -445,7 +445,7 @@ void Game::ExecuteJavaScriptCommandForDebug(String const& command, String const&
 {
     // Execute JavaScript command with Chrome DevTools integration for debugging
     // This method registers the script so it appears in DevTools Sources panel
-    
+
     if (g_v8Subsystem == nullptr)
     {
         DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptCommandForDebug() failed| %s | V8Subsystem is nullptr", command.c_str()));
@@ -486,7 +486,7 @@ void Game::ExecuteJavaScriptFileForDebug(String const& filename)
 {
     // Load JavaScript file and execute it with Chrome DevTools integration for debugging
     // This method reads a script file and registers it so it appears in DevTools Sources panel
-    
+
     if (g_v8Subsystem == nullptr)
     {
         DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptFileForDebug() failed| %s | V8Subsystem is nullptr", filename.c_str()));
@@ -500,9 +500,9 @@ void Game::ExecuteJavaScriptFileForDebug(String const& filename)
     }
 
     // Read the script file content
-    std::string fullPath = filename;
+    std::string   fullPath = filename;
     std::ifstream file(fullPath);
-    
+
     if (!file.is_open())
     {
         DAEMON_LOG(LogGame, eLogVerbosity::Error, Stringf("Game::ExecuteJavaScriptFileForDebug() failed to open file: %s", filename.c_str()));
@@ -522,7 +522,7 @@ void Game::ExecuteJavaScriptFileForDebug(String const& filename)
 
     // Extract just the filename for the script name in DevTools
     std::string scriptName = filename;
-    size_t lastSlash = scriptName.find_last_of("/\\");
+    size_t      lastSlash  = scriptName.find_last_of("/\\");
     if (lastSlash != std::string::npos)
     {
         scriptName = scriptName.substr(lastSlash + 1);
@@ -554,26 +554,28 @@ void Game::ExecuteJavaScriptFileForDebug(String const& filename)
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::ExecuteJavaScriptFile(const std::string& filename)
+void Game::ExecuteJavaScriptFile(String const& filename)
 {
-    if (g_v8Subsystem && g_v8Subsystem->IsInitialized())
-    {
-        DebuggerPrintf("執行 JS 檔案: %s\n", filename.c_str());
-        bool success = g_v8Subsystem->ExecuteScriptFile(filename);
+    if (g_v8Subsystem == nullptr)ERROR_AND_DIE(StringFormat("(Game::ExecuteJavaScriptFile)(g_v8Subsystem is nullptr!)"))
+    if (!g_v8Subsystem->IsInitialized())ERROR_AND_DIE(StringFormat("(Game::ExecuteJavaScriptFile)(g_v8Subsystem is not initialized!)"))
 
-        if (!success)
-        {
-            DebuggerPrintf("JavaScript 檔案執行失敗: %s\n", filename.c_str());
-            if (g_v8Subsystem->HasError())
-            {
-                DebuggerPrintf("錯誤: %s\n", g_v8Subsystem->GetLastError().c_str());
-            }
-        }
-    }
-    else
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, StringFormat("(Game::ExecuteJavaScriptFile)(start)({})", filename));
+
+    bool const success = g_v8Subsystem->ExecuteScriptFile(filename);
+
+    if (!success)
     {
-        DebuggerPrintf("V8Subsystem 不可用，無法執行 JS 檔案: %s\n", filename.c_str());
+        DAEMON_LOG(LogGame, eLogVerbosity::Error, StringFormat("(Game::ExecuteJavaScriptFile)(fail)({})", filename));
+
+        if (g_v8Subsystem->HasError())
+        {
+            DAEMON_LOG(LogGame, eLogVerbosity::Error, StringFormat("(Game::ExecuteJavaScriptFile)(fail)(error: {})", g_v8Subsystem->GetLastError()));
+        }
+
+        return;
     }
+
+    DAEMON_LOG(LogGame, eLogVerbosity::Log, StringFormat("(Game::ExecuteJavaScriptFile)(end)({})", filename.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -605,17 +607,21 @@ void Game::HandleJavaScriptCommands()
     // SCRIPT REGISTRY: F2 Key - Register for Chrome DevTools debugging  
     if (g_input->WasKeyJustPressed(VK_F2))
     {
-        // Load and execute F1 handler script from file for Chrome DevTools debugging
         ExecuteJavaScriptFileForDebug("Data/Scripts/F1_KeyHandler.js");
+        // ExecuteJavaScriptCommandForDebug("toggleShouldRender()","Data/Scripts/F1_KeyHandler.js");
+    }
+    if (g_input->WasKeyJustPressed(VK_F3))
+    {
+        // ExecuteJavaScriptFileForDebug("Data/Scripts/F1_KeyHandler.js");
+        ExecuteJavaScriptCommandForDebug("toggleShouldRender()", "Data/Scripts/F1_KeyHandler.js");
     }
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::CreateCube(Vec3 const& position)
 {
-    DebuggerPrintf("JavaScript 請求建立方塊在位置 (%.2f, %.2f, %.2f)\n", position.x, position.y, position.z);
+    DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("(Game::CreateCube)(start)(position ({:.2f}, {:.2f}, {:.2f}))", position.x, position.y, position.z));
 
-    // 建立新的方塊物件
     Prop* newCube       = new Prop(this);
     newCube->m_position = position;
     newCube->m_color    = Rgba8(
@@ -626,19 +632,19 @@ void Game::CreateCube(Vec3 const& position)
     );
     newCube->InitializeLocalVertsForCube();
 
-    // 加入到物件清單
     m_props.push_back(newCube);
 
-    DebuggerPrintf("方塊建立成功！目前共有 %zu 個物件\n", m_props.size());
+    DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("(Game::CreateCube)(end)(m_props size: {})", m_props.size()));
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::MoveProp(int propIndex, Vec3 const& newPosition)
+void Game::MoveProp(int         propIndex,
+                    Vec3 const& newPosition)
 {
     if (propIndex >= 0 && propIndex < static_cast<int>(m_props.size()))
     {
         m_props[propIndex]->m_position = newPosition;
-        DebuggerPrintf("物件 %d 移動到位置 (%.2f, %.2f, %.2f)\n", propIndex, newPosition.x, newPosition.y, newPosition.z);
+        DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("(Game::MoveProp)(end)(prop {} move to position ({:.2f}, {:.2f}, {:.2f}))", propIndex, newPosition.x, newPosition.y, newPosition.z));
     }
     else
     {
@@ -690,7 +696,7 @@ void Game::Render(float gameDeltaSeconds, float systemDeltaSeconds)
         // 新增：JavaScript 狀態顯示
         if (g_v8Subsystem)
         {
-            std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS: 已啟用" : "JS: 未啟用";
+            std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS:Initialized" : "JS:UnInitialized";
             DebugAddScreenText(jsStatus, Vec2(0, 100), 20.f, Vec2::ZERO, 0.f);
 
             if (g_v8Subsystem->HasError())
