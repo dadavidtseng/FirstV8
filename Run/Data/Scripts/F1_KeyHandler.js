@@ -71,6 +71,6 @@ if (typeof globalThis.shouldRender !== 'undefined') {
 }
 
 // Breakpoint helper - you can set a breakpoint here and inspect all variables
-debugger; // This will pause execution in Chrome DevTools when debugger is attached
+// debugger; // This will pause execution in Chrome DevTools when debugger is attached
 
 console.log('=== F1 HANDLER COMPLETE ===');

@@ -4,13 +4,13 @@ class JSEngine {
         this.game = null;
         this.isInitialized = false;
         this.frameCount = 0;
-        
+
         // System Registration
         this.registeredSystems = new Map();
         this.updateSystems = [];
         this.renderSystems = [];
         this.pendingOperations = [];
-        
+
         console.log('JSEngine: Created with system registration');
     }
 
@@ -35,7 +35,7 @@ class JSEngine {
     // ============================================================================
     // SYSTEM REGISTRATION API (for AI agents and runtime modifications)
     // ============================================================================
-    
+
     /**
      * Register a system for runtime execution
      * @param {string} id - Unique system identifier
@@ -58,8 +58,8 @@ class JSEngine {
         };
 
         this.registeredSystems.set(id, system);
-        this.queueOperation({ type: 'register', system });
-        
+        this.queueOperation({type: 'register', system});
+
         console.log(`JSEngine: Registered system '${id}' (priority: ${system.priority})`);
         return true;
     }
@@ -73,7 +73,7 @@ class JSEngine {
             return false;
         }
 
-        this.queueOperation({ type: 'unregister', id });
+        this.queueOperation({type: 'unregister', id});
         console.log(`JSEngine: Queued unregistration for system '${id}'`);
         return true;
     }
@@ -153,7 +153,7 @@ class JSEngine {
         this.updateSystems = this.updateSystems.filter(sys => sys.id !== id);
         this.renderSystems = this.renderSystems.filter(sys => sys.id !== id);
         this.registeredSystems.delete(id);
-        
+
         console.log(`JSEngine: System '${id}' removed from all lists`);
     }
 
@@ -165,15 +165,15 @@ class JSEngine {
         if (!this.isInitialized) {
             return;
         }
-        
+
         this.frameCount++;
         this.processOperations();
-        
+
         // FIRST: Call the original game's update method (maintains compatibility)
         if (this.game && this.game.update) {
             this.game.update(deltaTime);
         }
-        
+
         // THEN: Execute all registered update systems
         for (const system of this.updateSystems) {
             if (system.enabled && system.update) {
@@ -195,12 +195,12 @@ class JSEngine {
         if (!this.isInitialized) {
             return;
         }
-        
+
         // FIRST: Call the original game's render method (maintains compatibility)
         if (this.game && this.game.render) {
             this.game.render();
         }
-        
+
         // THEN: Execute all registered render systems
         for (const system of this.renderSystems) {
             if (system.enabled && system.render) {
@@ -242,7 +242,7 @@ class JSEngine {
     createCube(x, y, z) {
         if (typeof game !== 'undefined' && game.createCube) {
             game.createCube(x, y, z);
-            console.log(`JSEngine: Created cube at (${x}, ${y}, ${z})`);
+            console.log(`JSEngine: Created cube at (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)})`);
             return true;
         }
         console.warn('JSEngine: createCube not available');
@@ -252,7 +252,7 @@ class JSEngine {
     moveProp(index, x, y, z) {
         if (typeof game !== 'undefined' && game.moveProp) {
             game.moveProp(index, x, y, z);
-            console.log(`JSEngine: Moved prop ${index} to (${x}, ${y}, ${z})`);
+            console.log(`JSEngine: Moved prop ${index} to (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)})`);
             return true;
         }
         console.warn('JSEngine: moveProp not available');
@@ -264,7 +264,7 @@ class JSEngine {
             return game.getPlayerPos();
         }
         console.warn('JSEngine: getPlayerPos not available');
-        return { x: 0, y: 0, z: 0 };
+        return {x: 0, y: 0, z: 0};
     }
 
     moveCamera(x, y, z) {
