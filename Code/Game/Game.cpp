@@ -797,6 +797,9 @@ void Game::InitializeJavaScriptFramework()
         DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading JSEngine.js...");
         ExecuteJavaScriptFile("Data/Scripts/JSEngine.js");
 
+        DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading InputSystem.js...");
+        ExecuteJavaScriptFile("Data/Scripts/InputSystem.js");
+
         DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading JSGame.js...");
         ExecuteJavaScriptFile("Data/Scripts/JSGame.js");
 
