@@ -1,34 +1,40 @@
-// JSGame.js - Enhanced JavaScript Game Framework with System Registration
+//----------------------------------------------------------------------------------------------------
+// JSGame.js
+//----------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------
 class JSGame {
     constructor(engine) {
+        console.log('(JSGame::constructor)(start)');
         this.engine = engine;
-        this.elapsedTime = 0;
         this.frameCount = 0;
-        this.testCounter = 0;
 
-        // Create InputSystem instance for delegation (AI Agent file separation)
+        // Create InputSystem instance for delegation
         this.inputSystem = new InputSystem();
-        console.log('JSGame: Game instance created with InputSystem delegation');
-        
+
         // Register individual game systems
         this.registerGameSystems();
+
+        console.log('(JSGame::constructor)(end)');
     }
 
     /**
      * Register all game systems with the engine
      */
     registerGameSystems() {
-        if (!this.engine || !this.engine.registerSystem) {
+        if (this.engine == null || this.engine.registerSystem == null) {
             console.log('JSGame: Engine does not support system registration, using legacy mode');
             return;
         }
+
+        console.log('(JSGame::registerGameSystems)(start)');
 
         // Register C++ Bridge System (highest priority - must run first)
         this.engine.registerSystem('cppBridge', {
             update: (deltaTime) => this.updateCppBridge(deltaTime),
             render: () => this.renderCppBridge(),
             priority: 0,
-            data: { description: 'C++ engine bridge system' }
+            data: {description: 'C++ engine bridge system'}
         });
 
         // Register Input System (delegated to InputSystem.js for AI Agent separation)
@@ -41,19 +47,19 @@ class JSGame {
                 lastF1State: false
             }
         });
-
         // Register Cube Spawner System
+
         this.engine.registerSystem('cubeSpawner', {
             update: (deltaTime) => this.updateCubeSpawner(deltaTime),
             priority: 20,
-            data: { 
+            data: {
                 description: 'Spawns cubes every 4 seconds',
                 lastSpawnFrame: 0,
                 interval: 240
             }
         });
-
         // Register Prop Mover System
+
         this.engine.registerSystem('propMover', {
             update: (deltaTime) => this.updatePropMover(deltaTime),
             priority: 30,
@@ -75,18 +81,7 @@ class JSGame {
             }
         });
 
-        // Register Status Logger System (DISABLED - causes spam)
-        // this.engine.registerSystem('statusLogger', {
-        //     update: (deltaTime) => this.updateStatusLogger(deltaTime),
-        //     priority: 100,
-        //     data: {
-        //         description: 'Logs status every 10 seconds (DISABLED)',
-        //         lastLogFrame: 0,
-        //         interval: 600
-        //     }
-        // });
-
-        console.log('JSGame: All systems registered with engine');
+        console.log('(JSGame::registerGameSystems)(end)');
     }
 
     // ============================================================================
@@ -138,7 +133,6 @@ class JSGame {
      */
     updateCppBridge(deltaTime) {
         this.frameCount++;
-        this.elapsedTime += deltaTime / 1000.0;
 
         // Call C++ engine update through JSEngine (preserve original logic)
         if (this.engine) {
@@ -161,15 +155,6 @@ class JSGame {
         if (shouldRenderValue && this.engine) {
             this.engine.renderCppEngine(0.0, 0.0);
         }
-
-        // Log render info occasionally
-        if (this.frameCount % 600 === 0) {
-            // console.log('JSGame: Render called - frame ' + this.frameCount + ', shouldRender=' + shouldRenderValue);
-        }
-
-        if (!shouldRenderValue) {
-            // console.log('JSGame: Rendering skipped due to F1 toggle');
-        }
     }
 
     /**
@@ -179,16 +164,19 @@ class JSGame {
         const system = this.engine.getSystem('inputHandler');
         if (!system) return;
 
+        // Check if InputSystem has been reloaded (hot-reload support)
+        // Compare static class version instead of creating test instances
+        if (!this.inputSystemVersion || InputSystem.version > this.inputSystemVersion) {
+            console.log('JSGame: InputSystem hot-reloaded, creating new instance');
+            this.inputSystem = new InputSystem();
+            this.inputSystemVersion = InputSystem.version;
+        }
+
         // Delegate input handling to InputSystem (AI Agent separation)
         this.inputSystem.handleInput(deltaTime);
-        
+
         // Update system data from InputSystem for consistency
         system.data.lastF1State = this.inputSystem.getLastF1State();
-
-        // Log input system status occasionally
-        if (this.frameCount % 300 === 0) {
-            // console.log('JSGame: Input system active, delegated to InputSystem.js');
-        }
     }
 
     /**
@@ -231,83 +219,40 @@ class JSGame {
     }
 
     /**
-     * Status Logger System (DISABLED)
-     */
-    updateStatusLogger(deltaTime) {
-        // DISABLED - This system was causing console spam
-        // Enable only for debugging if needed
-        /*
-        const system = this.engine.getSystem('statusLogger');
-        if (!system) return;
-
-        if (this.frameCount - system.data.lastLogFrame >= system.data.interval) {
-            this.logStatus();
-            system.data.lastLogFrame = this.frameCount;
-        }
-        */
-    }
-
-    /**
      * Test methods to demonstrate the framework
      */
     testCreateCube() {
-        if (this.engine) {
-            const x = (Math.random() - 0.5) * 10;
-            const y = (Math.random() - 0.5) * 10;
-            const z = Math.random() * 3;
-
-            this.engine.createCube(x, y, z);
-            console.log('JSGame: Test - Created random cube');
-        }
+        // if (this.engine) {
+        //     const x = (Math.random() - 0.5) * 10;
+        //     const y = (Math.random() - 0.5) * 10;
+        //     const z = Math.random() * 3;
+        //
+        //     this.engine.createCube(x, y, z);
+        //     console.log('JSGame: Test - Created random cube');
+        // }
     }
 
     testMoveProp() {
-        if (this.engine) {
-            const propIndex = 0; // Move the first prop
-            const x = (Math.random() - 0.5) * 8;
-            const y = (Math.random() - 0.5) * 8;
-            const z = Math.random() * 2;
-
-            this.engine.moveProp(propIndex, x, y, z);
-            console.log('JSGame: Test - Moved prop');
-        }
+        // if (this.engine) {
+        //     const propIndex = 0; // Move the first prop
+        //     const x = (Math.random() - 0.5) * 8;
+        //     const y = (Math.random() - 0.5) * 8;
+        //     const z = Math.random() * 2;
+        //
+        //     this.engine.moveProp(propIndex, x, y, z);
+        //     console.log('JSGame: Test - Moved prop');
+        // }
     }
 
     testCameraShake() {
-        if (this.engine) {
-            const shakeX = (Math.random() - 0.5) * 0.2;
-            const shakeY = (Math.random() - 0.5) * 0.2;
-            const shakeZ = (Math.random() - 0.5) * 0.1;
-
-            this.engine.moveCamera(shakeX, shakeY, shakeZ);
-            console.log('JSGame: Test - Camera shake');
-        }
-    }
-
-    logStatus() {
-        // DISABLED - This method was causing spam in the console
-        // Uncomment for debugging if needed
-        /*
-        console.log('=== JSGame Status ===');
-        console.log('Frame Count: ' + this.frameCount);
-        console.log('Elapsed Time: ' + this.elapsedTime.toFixed(2) + 's');
-
-        if (this.engine) {
-            const playerPos = this.engine.getPlayerPosition();
-            console.log('Player Position: (' + playerPos.x + ', ' + playerPos.y + ', ' + playerPos.z + ')');
-        }
-
-        console.log('Engine Status:', this.engine ? this.engine.getStatus() : 'No engine');
-        
-        // Show registered systems info
-        if (this.engine && this.engine.listSystems) {
-            const systems = this.engine.listSystems();
-            console.log('Registered Systems:', systems.length);
-            systems.forEach(sys => {
-                console.log(`  - ${sys.id}: ${sys.enabled ? 'enabled' : 'DISABLED'} (priority: ${sys.priority})`);
-            });
-        }
-        */
+        // if (this.engine) {
+        //     const shakeX = (Math.random() - 0.5) * 0.2;
+        //     const shakeY = (Math.random() - 0.5) * 0.2;
+        //     const shakeZ = (Math.random() - 0.5) * 0.1;
+        //
+        //     this.engine.moveCamera(shakeX, shakeY, shakeZ);
+        //     console.log('JSGame: Test - Camera shake');
+        // }
     }
 }
 
@@ -320,51 +265,19 @@ if (typeof globalThis !== 'undefined') {
 
 const jsEngineInstance = new JSEngine();
 const jsGameInstance = new JSGame(jsEngineInstance);
-jsEngineInstance.initialize();
+// jsEngineInstance.initialize();
 jsEngineInstance.setGame(jsGameInstance);
 globalThis.JSEngine = jsEngineInstance;
 
-// ============================================================================
-// AI AGENT GLOBAL API
-// ============================================================================
-
-// Create a clean global API for AI agents and developers
-globalThis.GameAPI = {
-    // System management
-    registerSystem: (id, config) => jsEngineInstance.registerSystem(id, config),
-    unregisterSystem: (id) => jsEngineInstance.unregisterSystem(id),
-    setSystemEnabled: (id, enabled) => jsEngineInstance.setSystemEnabled(id, enabled),
-    getSystem: (id) => jsEngineInstance.getSystem(id),
-    listSystems: () => jsEngineInstance.listSystems(),
-    
-    // Input system demo
-    enableInput: () => jsGameInstance.enableInput(),
-    disableInput: () => jsGameInstance.disableInput(),
-    isInputEnabled: () => jsGameInstance.isInputEnabled(),
-    
-    // Engine status
-    getStatus: () => jsEngineInstance.getStatus(),
-    
-    // Direct access for advanced use
-    engine: jsEngineInstance,
-    game: jsGameInstance
-};
+// Make jsGameInstance globally accessible for hot-reload
+globalThis.jsGameInstance = jsGameInstance;
 
 // Initialize shouldRender flag for F1 toggle functionality
 if (typeof globalThis.shouldRender === 'undefined') {
     globalThis.shouldRender = true;
 }
 
-console.log('JSGame: Enhanced system registration framework initialized');
-console.log('Available API: globalThis.GameAPI');
-console.log('  - GameAPI.enableInput() / disableInput()');
-console.log('  - GameAPI.registerSystem(id, config)');
-console.log('  - GameAPI.unregisterSystem(id)');
-console.log('  - GameAPI.setSystemEnabled(id, enabled)');
-console.log('  - GameAPI.listSystems()');
-console.log('');
-console.log('=== INPUT SYSTEM DEMO ===');
-console.log('Input system is currently:', jsGameInstance.isInputEnabled() ? 'ENABLED' : 'DISABLED');
-console.log('To disable input: GameAPI.disableInput()');
-console.log('To enable input: GameAPI.enableInput()');
-console.log('==========================');
+console.log('JSGame: System registration framework initialized');
+console.log('Available API: globalThis.GameAPI for system management');
+console.log('Input system status:', jsGameInstance.isInputEnabled() ? 'ENABLED' : 'DISABLED');
+console.log('Hot-reload system status:', jsEngineInstance.hotReloadEnabled ? 'AVAILABLE (C++)' : 'NOT AVAILABLE');

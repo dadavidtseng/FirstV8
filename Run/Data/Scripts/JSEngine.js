@@ -1,8 +1,12 @@
-// JSEngine.js - Enhanced JavaScript Engine Framework with System Registration
+//----------------------------------------------------------------------------------------------------
+// JSEngine.js
+//----------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------
 class JSEngine {
     constructor() {
         this.game = null;
-        this.isInitialized = false;
+        this.isInitialized = true;
         this.frameCount = 0;
 
         // System Registration
@@ -11,18 +15,45 @@ class JSEngine {
         this.renderSystems = [];
         this.pendingOperations = [];
 
-        console.log('JSEngine: Created with system registration');
+        // C++ Hot-Reload System (handled by C++ FileWatcher + ScriptReloader)
+        this.hotReloadEnabled = true; // C++ hot-reload system availability flag
+
+        console.log('JSEngine: Created with system registration support');
     }
 
     /**
      * Initialize the engine
      */
-    initialize() {
-        console.log('JSEngine: Initializing...');
-        this.isInitialized = true;
-        this.frameCount = 0;
-        return this;
-    }
+    // initialize() {
+    //     console.log('JSEngine: Initializing...');
+    //     this.isInitialized = true;
+    //     this.frameCount = 0;
+    //
+    //     // Initialize hot-reload system
+    //     this.initializeHotReloadSystem();
+    //
+    //     return this;
+    // }
+
+    /**
+     * Initialize the hot-reload system - now handled by C++ 
+     */
+    // initializeHotReloadSystem() {
+    //     try {
+    //         console.log('JSEngine: Hot-reload system is now handled by C++ (FileWatcher + ScriptReloader)');
+    //
+    //         // The C++ hot-reload system is automatically initialized in App::SetupScriptingBindings()
+    //         // No JavaScript initialization needed - C++ handles file monitoring and script reloading
+    //         this.hotReloadEnabled = true;
+    //
+    //         console.log('JSEngine: C++ hot-reload system acknowledged');
+    //
+    //     } catch (error) {
+    //         console.log('JSEngine: Hot-reload system initialization failed:', error);
+    //         this.hotReloadEnabled = false;
+    //     }
+    // }
+
 
     /**
      * Set the game instance
@@ -116,6 +147,7 @@ class JSEngine {
         });
     }
 
+
     // ============================================================================
     // INTERNAL SYSTEM MANAGEMENT
     // ============================================================================
@@ -169,19 +201,13 @@ class JSEngine {
         this.frameCount++;
         this.processOperations();
 
-        // FIRST: Call the original game's update method (maintains compatibility)
-        if (this.game && this.game.update) {
-            this.game.update(deltaTime);
-        }
-
-        // THEN: Execute all registered update systems
+        // Execute all registered update systems
         for (const system of this.updateSystems) {
             if (system.enabled && system.update) {
                 try {
                     system.update(deltaTime);
                 } catch (error) {
                     console.log(`JSEngine: Error in system '${system.id}' update:`, error);
-                    // console.error(`JSEngine: Error in system '${system.id}' update:`, error);
                 }
             }
         }
@@ -196,12 +222,7 @@ class JSEngine {
             return;
         }
 
-        // FIRST: Call the original game's render method (maintains compatibility)
-        if (this.game && this.game.render) {
-            this.game.render();
-        }
-
-        // THEN: Execute all registered render systems
+        // Execute all registered render systems
         for (const system of this.renderSystems) {
             if (system.enabled && system.render) {
                 try {
@@ -277,7 +298,7 @@ class JSEngine {
     }
 
     /**
-     * Get engine status (enhanced with system registration info)
+     * Get engine status
      */
     getStatus() {
         return {
@@ -287,7 +308,8 @@ class JSEngine {
             systemCount: this.registeredSystems.size,
             updateSystemCount: this.updateSystems.length,
             renderSystemCount: this.renderSystems.length,
-            pendingOperations: this.pendingOperations.length
+            pendingOperations: this.pendingOperations.length,
+            hotReloadEnabled: this.hotReloadEnabled // C++ hot-reload system status
         };
     }
 }
