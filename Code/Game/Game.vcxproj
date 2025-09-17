@@ -28,8 +28,7 @@
     </PropertyGroup>
 
     <Import Project="$(VCTargetsPath)/Microsoft.Cpp.Default.props"/>
-
-    <!-- V8 Package Imports - Automatic V8 Configuration -->
+    <!-- V8 import from Engine -->
     <Import Project="$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/build/native/v8-v143-x64.props"/>
     <Import Project="$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/build/native/v8.redist-v143-x64.props"/>
 
@@ -239,9 +238,11 @@
     <ItemGroup>
         <ClCompile Include="Entity.cpp"/>
         <ClCompile Include="Framework/App.cpp"/>
+        <ClCompile Include="Framework/FileWatcher.cpp"/>
         <ClCompile Include="Framework/GameCommon.cpp"/>
         <ClCompile Include="Framework/GameScriptInterface.cpp"/>
         <ClCompile Include="Framework/Main_Windows.cpp"/>
+        <ClCompile Include="Framework/ScriptReloader.cpp"/>
         <ClCompile Include="Game.cpp"/>
         <ClCompile Include="Player.cpp"/>
         <ClCompile Include="Prop.cpp"/>
@@ -253,8 +254,10 @@
         <ClInclude Include="EngineBuildPreferences.hpp"/>
         <ClInclude Include="Entity.hpp"/>
         <ClInclude Include="Framework/App.hpp"/>
+        <ClInclude Include="Framework/FileWatcher.hpp"/>
         <ClInclude Include="Framework/GameCommon.hpp"/>
         <ClInclude Include="Framework/GameScriptInterface.hpp"/>
+        <ClInclude Include="Framework/ScriptReloader.hpp"/>
         <ClInclude Include="Game.hpp"/>
         <ClInclude Include="Player.hpp"/>
         <ClInclude Include="Prop.hpp"/>

@@ -793,17 +793,20 @@ void Game::InitializeJavaScriptFramework()
 
     try
     {
-        // Load the JavaScript framework files
+        // Load the JavaScript framework files in dependency order
         DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading JSEngine.js...");
         ExecuteJavaScriptFile("Data/Scripts/JSEngine.js");
 
         DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading InputSystem.js...");
         ExecuteJavaScriptFile("Data/Scripts/InputSystem.js");
 
+        // Hot-reload system is now implemented in C++ (FileWatcher + ScriptReloader)
+        // No longer need to load JavaScript hot-reload files
+
         DAEMON_LOG(LogGame, eLogVerbosity::Display, "Loading JSGame.js...");
         ExecuteJavaScriptFile("Data/Scripts/JSGame.js");
 
-        DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::InitializeJavaScriptFramework() complete");
+        DAEMON_LOG(LogGame, eLogVerbosity::Display, "Game::InitializeJavaScriptFramework() complete - C++ hot-reload system integrated");
     }
     catch (...)
     {

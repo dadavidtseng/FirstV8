@@ -46,6 +46,12 @@
     <ClCompile Include="Framework\GameScriptInterface.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+    <ClCompile Include="Framework\FileWatcher.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ScriptReloader.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.hpp">
@@ -73,6 +79,12 @@
       <Filter>Framework</Filter>
     </ClInclude>
     <ClInclude Include="Framework\GameScriptInterface.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\FileWatcher.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ScriptReloader.hpp">
       <Filter>Framework</Filter>
     </ClInclude>
   </ItemGroup>
