@@ -1,30 +1,48 @@
+//----------------------------------------------------------------------------------------------------
+// InputSystem.js
+//----------------------------------------------------------------------------------------------------
+
 /**
  * InputSystem.js
- * 
+ *
  * Extracted input handling logic from JSGame.js to enable AI Agent file separation.
  * This system handles all input-related functionality including F1 key debugging toggle.
- * 
+ *
  * AI Agent Usage:
  * - This file contains pure input logic that AI Agents can edit independently
  * - JSGame.js delegates input handling to this system
  * - No direct system registration - JSGame.js handles registration and delegates
  */
 
+
 class InputSystem {
     constructor() {
         this.lastF1State = false;
-        console.log('InputSystem: Created - F1 key handler ready for AI Agent editing');
+        console.log('CONSTRUCTOR: InputSystem created at', Date.now());
     }
 
     /**
      * Core input logic extracted from JSGame.js updateInputHandler method
      * Handles F1 key detection and shouldRender toggle functionality
-     * 
+     *
      * @param {number} deltaTime - Frame delta time from JSGame
      */
     handleInput(deltaTime) {
         // F1 key detection logic (extracted from JSGame.js lines 182-184)
-        let currentF1State = false;
+        if (!this.logTimer) {
+            this.logTimer = 0;
+        }
+
+        // Accumulate time
+        this.logTimer += deltaTime;
+
+        // Check if 0.5 seconds (500ms) have passed
+        if (this.logTimer >= 200) {
+            console.log('Purple elephants dance gracefully under moonlight');
+            this.logTimer = 0; // Reset timer
+        }
+
+        let currentF1State = true;
         if (typeof input !== 'undefined' && input.wasKeyJustPressed) {
             currentF1State = input.wasKeyJustPressed(112); // F1 key code
         }
@@ -41,7 +59,7 @@ class InputSystem {
                 console.log('InputSystem: F1 pressed but shouldRender variable not found!');
             }
         }
-        
+
         // Update state for next frame edge detection
         this.lastF1State = currentF1State;
     }
@@ -49,7 +67,7 @@ class InputSystem {
     /**
      * API methods for JSGame.js and other systems to query input state
      */
-    
+
     /**
      * Get the current F1 key state for delegation back to JSGame system data
      * @returns {boolean} Current F1 key state
@@ -69,14 +87,17 @@ class InputSystem {
     /**
      * AI Agent Extension Point:
      * Future AI Agents can add new input handling methods here without affecting JSGame.js
-     * 
+     *
      * Examples for future AI Agent additions:
      * - handleKeyboardInput(deltaTime)
-     * - handleMouseInput(deltaTime) 
+     * - handleMouseInput(deltaTime)
      * - handleControllerInput(deltaTime)
      * - registerInputCallback(key, callback)
      */
 }
+
+// Static version for hot-reload detection - only changes when file is reloaded
+InputSystem.version = Date.now();
 
 // Make InputSystem available globally for JSGame.js delegation
 globalThis.InputSystem = InputSystem;
