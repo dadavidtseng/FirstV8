@@ -299,6 +299,12 @@ void App::Update()
 {
     Clock::TickSystemClock();
     UpdateCursorMode();
+    
+    // Process pending hot-reload events on main thread (V8-safe)
+    if (m_gameScriptInterface) {
+        m_gameScriptInterface->ProcessPendingHotReloadEvents();
+    }
+    
     g_game->Update();
 }
 
@@ -411,6 +417,15 @@ void App::SetupScriptingBindings()
 
     m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_game);
     g_v8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
+    
+    // Initialize hot-reload system
+    std::string projectRoot = "C:/p4/Personal/SD/FirstV8/";
+    if (m_gameScriptInterface->InitializeHotReload(g_v8Subsystem, projectRoot)) {
+        DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("(App::SetupScriptingBindings) Hot-reload system initialized successfully"));
+    } else {
+        DAEMON_LOG(LogScript, eLogVerbosity::Warning, StringFormat("(App::SetupScriptingBindings) Hot-reload system initialization failed"));
+    }
+    
     m_inputScriptInterface = std::make_shared<InputScriptInterface>(g_input);
     g_v8Subsystem->RegisterScriptableObject("input", m_inputScriptInterface);
 

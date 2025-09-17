@@ -8,21 +8,35 @@
 #include "Game/Player.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/LogSubsystem.hpp"
+#include "Engine/Core/StringUtils.hpp"
+#include "Engine/Scripting/V8Subsystem.hpp"
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
 
 #include "GameCommon.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include <filesystem>
+#include <chrono>
 
 //----------------------------------------------------------------------------------------------------
 GameScriptInterface::GameScriptInterface(Game* game)
     : m_game(game)
+    , m_fileWatcher(std::make_unique<FileWatcher>())
+    , m_scriptReloader(std::make_unique<ScriptReloader>())
 {
     if (!g_game)
     {
         ERROR_AND_DIE("GameScriptInterface: Game pointer cannot be null")
     }
+}
+
+//----------------------------------------------------------------------------------------------------
+GameScriptInterface::~GameScriptInterface()
+{
+    ShutdownHotReload();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -82,7 +96,48 @@ std::vector<ScriptMethodInfo> GameScriptInterface::GetAvailableMethods() const
         ScriptMethodInfo("getGameState",
                          "取得目前遊戲狀態",
                          {},
-                         "string")
+                         "string"),
+
+        ScriptMethodInfo("getFileTimestamp",
+                         "取得檔案的最後修改時間戳記",
+                         {"string"},
+                         "number"),
+
+        // Hot-reload system methods
+        ScriptMethodInfo("enableHotReload",
+                         "啟用熱重載系統",
+                         {},
+                         "bool"),
+
+        ScriptMethodInfo("disableHotReload",
+                         "停用熱重載系統",
+                         {},
+                         "bool"),
+
+        ScriptMethodInfo("isHotReloadEnabled",
+                         "檢查熱重載系統是否啟用",
+                         {},
+                         "bool"),
+
+        ScriptMethodInfo("addWatchedFile",
+                         "新增要監控的檔案",
+                         {"string"},
+                         "bool"),
+
+        ScriptMethodInfo("removeWatchedFile",
+                         "移除監控的檔案",
+                         {"string"},
+                         "bool"),
+
+        ScriptMethodInfo("getWatchedFiles",
+                         "取得目前監控的檔案清單",
+                         {},
+                         "string"),
+
+        ScriptMethodInfo("reloadScript",
+                         "手動重載指定的腳本檔案",
+                         {"string"},
+                         "bool")
     };
 }
 
@@ -140,6 +195,38 @@ ScriptMethodResult GameScriptInterface::CallMethod(std::string const&           
         else if (methodName == "getGameState")
         {
             return ExecuteGetGameState(args);
+        }
+        else if (methodName == "getFileTimestamp")
+        {
+            return ExecuteGetFileTimestamp(args);
+        }
+        else if (methodName == "enableHotReload")
+        {
+            return ExecuteEnableHotReload(args);
+        }
+        else if (methodName == "disableHotReload")
+        {
+            return ExecuteDisableHotReload(args);
+        }
+        else if (methodName == "isHotReloadEnabled")
+        {
+            return ExecuteIsHotReloadEnabled(args);
+        }
+        else if (methodName == "addWatchedFile")
+        {
+            return ExecuteAddWatchedFile(args);
+        }
+        else if (methodName == "removeWatchedFile")
+        {
+            return ExecuteRemoveWatchedFile(args);
+        }
+        else if (methodName == "getWatchedFiles")
+        {
+            return ExecuteGetWatchedFiles(args);
+        }
+        else if (methodName == "reloadScript")
+        {
+            return ExecuteReloadScript(args);
         }
 
         return ScriptMethodResult::Error("未知的方法: " + methodName);
@@ -537,4 +624,314 @@ ScriptMethodResult GameScriptInterface::ValidateArgCountRange(const std::vector<
         return ScriptMethodResult::Error(oss.str());
     }
     return ScriptMethodResult::Success();
+}
+
+//----------------------------------------------------------------------------------------------------
+ScriptMethodResult GameScriptInterface::ExecuteGetFileTimestamp(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 1, "getFileTimestamp");
+    if (!result.success) return result;
+
+    try
+    {
+        std::string filePath = ExtractString(args[0]);
+        
+        // The filePath comes from HotReloader as 'Data/Scripts/filename.js'
+        // Build absolute path from the known project structure
+        std::string projectRoot = "C:/p4/Personal/SD/FirstV8/";
+        std::string fullPath = projectRoot + "Run/" + filePath;
+        
+        // Debug: Log the paths being used
+        DebuggerPrintf("getFileTimestamp: Input path = %s\n", filePath.c_str());
+        DebuggerPrintf("getFileTimestamp: Full path = %s\n", fullPath.c_str());
+        
+        // Get file timestamp using standard library
+        if (std::filesystem::exists(fullPath))
+        {
+            auto ftime = std::filesystem::last_write_time(fullPath);
+            auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+            auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(sctp.time_since_epoch()).count();
+            
+            return ScriptMethodResult::Success(static_cast<double>(timestamp));
+        }
+        else
+        {
+            return ScriptMethodResult::Error("檔案不存在: " + filePath);
+        }
+    }
+    catch (const std::exception& e)
+    {
+        return ScriptMethodResult::Error("取得檔案時間戳記失敗: " + std::string(e.what()));
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+// Hot-reload system initialization
+//----------------------------------------------------------------------------------------------------
+bool GameScriptInterface::InitializeHotReload(V8Subsystem* v8System, const std::string& projectRoot)
+{
+    try {
+        DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("GameScriptInterface: Initializing hot-reload system..."));
+        
+        // Store project root for path construction
+        m_projectRoot = projectRoot;
+        
+        // Initialize FileWatcher
+        if (!m_fileWatcher->Initialize(projectRoot)) {
+            DAEMON_LOG(LogScript, eLogVerbosity::Error, StringFormat("GameScriptInterface: Failed to initialize FileWatcher"));
+            return false;
+        }
+        
+        // Initialize ScriptReloader
+        if (!m_scriptReloader->Initialize(v8System)) {
+            DAEMON_LOG(LogScript, eLogVerbosity::Error, StringFormat("GameScriptInterface: Failed to initialize ScriptReloader"));
+            return false;
+        }
+        
+        // Set up callbacks
+        m_fileWatcher->SetChangeCallback([this](const std::string& filePath) {
+            OnFileChanged(filePath);
+        });
+        
+        m_scriptReloader->SetReloadCompleteCallback([this](bool success, const std::string& error) {
+            OnReloadComplete(success, error);
+        });
+        
+        // Add default watched files
+        m_fileWatcher->AddWatchedFile("Data/Scripts/JSEngine.js");
+        m_fileWatcher->AddWatchedFile("Data/Scripts/JSGame.js");
+        m_fileWatcher->AddWatchedFile("Data/Scripts/InputSystem.js");
+        
+        // Start watching
+        m_fileWatcher->StartWatching();
+        m_hotReloadEnabled = true;
+        
+        DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("GameScriptInterface: Hot-reload system initialized successfully"));
+        return true;
+    }
+    catch (const std::exception& e) {
+        DAEMON_LOG(LogScript, eLogVerbosity::Error, StringFormat("GameScriptInterface: Hot-reload initialization failed: {}", e.what()));
+        return false;
+    }
+}
+
+void GameScriptInterface::ShutdownHotReload()
+{
+    try {
+        if (m_fileWatcher) {
+            m_fileWatcher->Shutdown();
+        }
+        if (m_scriptReloader) {
+            m_scriptReloader->Shutdown();
+        }
+        m_hotReloadEnabled = false;
+        DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("GameScriptInterface: Hot-reload system shutdown completed"));
+    }
+    catch (const std::exception& e) {
+        DAEMON_LOG(LogScript, eLogVerbosity::Error, StringFormat("GameScriptInterface: Hot-reload shutdown error: {}", e.what()));
+    }
+}
+
+void GameScriptInterface::OnFileChanged(const std::string& filePath)
+{
+    try {
+        DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("GameScriptInterface: File changed (queuing for main thread): {}", filePath));
+        
+        // Queue the file change for main thread processing (thread-safe)
+        if (m_hotReloadEnabled) {
+            std::lock_guard<std::mutex> lock(m_fileChangeQueueMutex);
+            m_pendingFileChanges.push(filePath);
+        }
+    }
+    catch (const std::exception& e) {
+        DAEMON_LOG(LogScript, eLogVerbosity::Error, StringFormat("GameScriptInterface: File change handling error: {}", e.what()));
+    }
+}
+
+void GameScriptInterface::OnReloadComplete(bool success, const std::string& error)
+{
+    if (success) {
+        DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("GameScriptInterface: Script reload completed successfully"));
+    } else {
+        DAEMON_LOG(LogScript, eLogVerbosity::Error, StringFormat("GameScriptInterface: Script reload failed: {}", error));
+    }
+}
+
+void GameScriptInterface::ProcessPendingHotReloadEvents()
+{
+    try {
+        // Process all pending file changes on the main thread (V8-safe)
+        std::queue<std::string> filesToProcess;
+        
+        // Get all pending changes under lock
+        {
+            std::lock_guard<std::mutex> lock(m_fileChangeQueueMutex);
+            filesToProcess.swap(m_pendingFileChanges); // Efficiently move all items
+        }
+        
+        // Process all file changes outside the lock
+        while (!filesToProcess.empty()) {
+            const std::string& filePath = filesToProcess.front();
+            
+            DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("GameScriptInterface: Processing file change on main thread: {}", filePath));
+            
+            // Convert relative path to absolute path for ScriptReloader
+            std::string absolutePath = GetAbsoluteScriptPath(filePath);
+            
+            // Now safe to call V8 from main thread
+            if (m_scriptReloader && m_hotReloadEnabled) {
+                m_scriptReloader->ReloadScript(absolutePath);
+            }
+            
+            filesToProcess.pop();
+        }
+    }
+    catch (const std::exception& e) {
+        DAEMON_LOG(LogScript, eLogVerbosity::Error, StringFormat("GameScriptInterface: Error processing pending hot-reload events: {}", e.what()));
+    }
+}
+
+std::string GameScriptInterface::GetAbsoluteScriptPath(const std::string& relativePath) const
+{
+    // Same logic as FileWatcher::GetFullPath()
+    std::filesystem::path fullPath = std::filesystem::path(m_projectRoot) / "Run" / relativePath;
+    return fullPath.string();
+}
+
+//----------------------------------------------------------------------------------------------------
+// Hot-reload method implementations
+//----------------------------------------------------------------------------------------------------
+ScriptMethodResult GameScriptInterface::ExecuteEnableHotReload(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 0, "enableHotReload");
+    if (!result.success) return result;
+    
+    try {
+        if (!m_fileWatcher || !m_scriptReloader) {
+            return ScriptMethodResult::Error("熱重載系統未初始化");
+        }
+        
+        if (!m_hotReloadEnabled) {
+            m_fileWatcher->StartWatching();
+            m_hotReloadEnabled = true;
+        }
+        
+        return ScriptMethodResult::Success(true);
+    }
+    catch (const std::exception& e) {
+        return ScriptMethodResult::Error("啟用熱重載失敗: " + std::string(e.what()));
+    }
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteDisableHotReload(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 0, "disableHotReload");
+    if (!result.success) return result;
+    
+    try {
+        if (m_fileWatcher && m_hotReloadEnabled) {
+            m_fileWatcher->StopWatching();
+            m_hotReloadEnabled = false;
+        }
+        
+        return ScriptMethodResult::Success(true);
+    }
+    catch (const std::exception& e) {
+        return ScriptMethodResult::Error("停用熱重載失敗: " + std::string(e.what()));
+    }
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteIsHotReloadEnabled(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 0, "isHotReloadEnabled");
+    if (!result.success) return result;
+    
+    return ScriptMethodResult::Success(m_hotReloadEnabled);
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteAddWatchedFile(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 1, "addWatchedFile");
+    if (!result.success) return result;
+    
+    try {
+        std::string filePath = ExtractString(args[0]);
+        
+        if (!m_fileWatcher) {
+            return ScriptMethodResult::Error("FileWatcher 未初始化");
+        }
+        
+        m_fileWatcher->AddWatchedFile(filePath);
+        return ScriptMethodResult::Success(true);
+    }
+    catch (const std::exception& e) {
+        return ScriptMethodResult::Error("新增監控檔案失敗: " + std::string(e.what()));
+    }
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteRemoveWatchedFile(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 1, "removeWatchedFile");
+    if (!result.success) return result;
+    
+    try {
+        std::string filePath = ExtractString(args[0]);
+        
+        if (!m_fileWatcher) {
+            return ScriptMethodResult::Error("FileWatcher 未初始化");
+        }
+        
+        m_fileWatcher->RemoveWatchedFile(filePath);
+        return ScriptMethodResult::Success(true);
+    }
+    catch (const std::exception& e) {
+        return ScriptMethodResult::Error("移除監控檔案失敗: " + std::string(e.what()));
+    }
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteGetWatchedFiles(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 0, "getWatchedFiles");
+    if (!result.success) return result;
+    
+    try {
+        if (!m_fileWatcher) {
+            return ScriptMethodResult::Error("FileWatcher 未初始化");
+        }
+        
+        auto watchedFiles = m_fileWatcher->GetWatchedFiles();
+        
+        // Build comma-separated string of watched files
+        std::string fileList;
+        for (size_t i = 0; i < watchedFiles.size(); ++i) {
+            if (i > 0) fileList += ", ";
+            fileList += watchedFiles[i];
+        }
+        
+        return ScriptMethodResult::Success(fileList);
+    }
+    catch (const std::exception& e) {
+        return ScriptMethodResult::Error("取得監控檔案清單失敗: " + std::string(e.what()));
+    }
+}
+
+ScriptMethodResult GameScriptInterface::ExecuteReloadScript(const std::vector<std::any>& args)
+{
+    auto result = ValidateArgCount(args, 1, "reloadScript");
+    if (!result.success) return result;
+    
+    try {
+        std::string scriptPath = ExtractString(args[0]);
+        
+        if (!m_scriptReloader) {
+            return ScriptMethodResult::Error("ScriptReloader 未初始化");
+        }
+        
+        bool success = m_scriptReloader->ReloadScript(scriptPath);
+        return ScriptMethodResult::Success(success);
+    }
+    catch (const std::exception& e) {
+        return ScriptMethodResult::Error("重載腳本失敗: " + std::string(e.what()));
+    }
 }
