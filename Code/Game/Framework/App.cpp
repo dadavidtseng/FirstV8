@@ -23,7 +23,6 @@
 #include "Engine/Scripting/V8Subsystem.hpp"
 #include "Game/Game.hpp"
 #include "Game/Framework/GameCommon.hpp"
-#include "Game/Subsystem/Light/LightSubsystem.hpp"
 
 //----------------------------------------------------------------------------------------------------
 App*                   g_app               = nullptr;       // Created and owned by Main_Windows.cpp
@@ -33,7 +32,6 @@ Game*                  g_game              = nullptr;       // Created and owned
 Renderer*              g_renderer          = nullptr;       // Created and owned by the App
 RandomNumberGenerator* g_rng               = nullptr;       // Created and owned by the App
 Window*                g_window            = nullptr;       // Created and owned by the App
-LightSubsystem*        g_lightSubsystem    = nullptr;       // Created and owned by the App
 ResourceSubsystem*     g_resourceSubsystem = nullptr;       // Created and owned by the App
 V8Subsystem*           g_v8Subsystem       = nullptr;
 
@@ -136,12 +134,11 @@ void App::Startup()
     config.rotationConfigPath  = "Data/Config/LogRotation.json"; // 輪轉配置檔案路徑
 
     // Configure Minecraft-style rotation settings
-    config.smartRotationConfig.maxFileSizeBytes  = 100 * 1024 * 1024;  // 100MB per file
-    config.smartRotationConfig.maxTimeInterval   = std::chrono::hours(2); // 2 hours max per segment
-    // config.smartRotationConfig.enableCompression = true;                // Enable .gz compression
-    config.smartRotationConfig.logDirectory      = "Logs";                   // Log directory
-    config.smartRotationConfig.currentLogName    = "latest.log";           // Current session log
-    config.smartRotationConfig.sessionPrefix     = "session";               // Archive prefix
+    config.smartRotationConfig.maxFileSizeBytes = 100 * 1024 * 1024;  // 100MB per file
+    config.smartRotationConfig.maxTimeInterval  = std::chrono::hours(2); // 2 hours max per segment
+    config.smartRotationConfig.logDirectory   = "Logs";                   // Log directory
+    config.smartRotationConfig.currentLogName = "latest.log";           // Current session log
+    config.smartRotationConfig.sessionPrefix  = "session";               // Archive prefix
 
     g_logSubsystem = new LogSubsystem(config);
 
@@ -151,10 +148,7 @@ void App::Startup()
     sAudioSystemConfig constexpr sAudioSystemConfig;
     g_audio = new AudioSystem(sAudioSystemConfig);
 
-    sLightConfig constexpr lightConfig;
-    g_lightSubsystem = new LightSubsystem(lightConfig);
-
-    //-End-of-NetworkSubsystem------------------------------------------------------------------------
+    //-End-of-AudioSystem-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     //-Start-of-ResourceSubsystem---------------------------------------------------------------------
 
@@ -189,7 +183,6 @@ void App::Startup()
     g_devConsole->StartUp();
     g_input->Startup();
     g_audio->Startup();
-    g_lightSubsystem->StartUp();
     g_resourceSubsystem->Startup();
     g_v8Subsystem->Startup();
 
@@ -224,7 +217,6 @@ void App::Shutdown()
     GAME_SAFE_RELEASE(g_bitmapFont);
 
     g_v8Subsystem->Shutdown();
-    g_lightSubsystem->ShutDown();
     g_audio->Shutdown();
     g_input->Shutdown();
     g_devConsole->Shutdown();
@@ -291,7 +283,6 @@ void App::BeginFrame() const
     g_devConsole->BeginFrame();
     g_input->BeginFrame();
     g_audio->BeginFrame();
-    g_lightSubsystem->BeginFrame();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -299,12 +290,13 @@ void App::Update()
 {
     Clock::TickSystemClock();
     UpdateCursorMode();
-    
+
     // Process pending hot-reload events on main thread (V8-safe)
-    if (m_gameScriptInterface) {
+    if (m_gameScriptInterface)
+    {
         m_gameScriptInterface->ProcessPendingHotReloadEvents();
     }
-    
+
     g_game->Update();
 }
 
@@ -337,7 +329,6 @@ void App::EndFrame() const
     g_devConsole->EndFrame();
     g_input->EndFrame();
     g_audio->EndFrame();
-    g_lightSubsystem->EndFrame();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -417,15 +408,18 @@ void App::SetupScriptingBindings()
 
     m_gameScriptInterface = std::make_shared<GameScriptInterface>(g_game);
     g_v8Subsystem->RegisterScriptableObject("game", m_gameScriptInterface);
-    
+
     // Initialize hot-reload system
     std::string projectRoot = "C:/p4/Personal/SD/FirstV8/";
-    if (m_gameScriptInterface->InitializeHotReload(g_v8Subsystem, projectRoot)) {
+    if (m_gameScriptInterface->InitializeHotReload(g_v8Subsystem, projectRoot))
+    {
         DAEMON_LOG(LogScript, eLogVerbosity::Log, StringFormat("(App::SetupScriptingBindings) Hot-reload system initialized successfully"));
-    } else {
+    }
+    else
+    {
         DAEMON_LOG(LogScript, eLogVerbosity::Warning, StringFormat("(App::SetupScriptingBindings) Hot-reload system initialization failed"));
     }
-    
+
     m_inputScriptInterface = std::make_shared<InputScriptInterface>(g_input);
     g_v8Subsystem->RegisterScriptableObject("input", m_inputScriptInterface);
 

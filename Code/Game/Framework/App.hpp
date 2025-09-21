@@ -19,7 +19,7 @@ class App
 public:
     App()  = default;
     ~App() = default;
-    void ExecuteJavaScriptFile(String const& filename);
+
     void Startup();
     void Shutdown();
     void RunFrame();
