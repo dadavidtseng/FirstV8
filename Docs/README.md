@@ -1,12 +1,23 @@
-# FirstV8 - Dual-Language Game Engine with V8 JavaScript Integration
+# FirstV8
 
-**Part of the "First" Series** - Advanced Game Development Research Projects
+## Make it First, V8 JavaScript Engine and Chrome DevTools integration into DaemonEngine
 
-A sophisticated C++ game engine demonstrating cutting-edge dual-language architecture through seamless integration of **V8 JavaScript Engine** and **Chrome DevTools** with the **DaemonEngine** foundation. This project represents the next evolution in modern game development methodologies, enabling unprecedented flexibility between performance-critical C++ systems and rapid JavaScript prototyping.
+![C++](https://img.shields.io/badge/C++20-grey?style=for-the-badge&logo=cplusplus)
+![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey?style=for-the-badge&logo=windows)
+![Graphics API](https://img.shields.io/badge/Graphics%20API-DirectX%2011-green?style=for-the-badge&logo=microsoft)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge&logo=apache)
+
+A sophisticated C++ game engine demonstrating dual-language architecture through seamless integration of **V8 JavaScript
+Engine** and **Chrome DevTools** with the **DaemonEngine** foundation. This project represents the next evolution in
+modern game development methodologies, enabling unprecedented flexibility between performance-critical C++ systems and
+rapid JavaScript prototyping.
 
 ## 🚀 Project Overview
 
-FirstV8 is a groundbreaking research project that bridges the gap between traditional C++ game engine performance and modern JavaScript development workflows. As part of the "First" series of experimental game development frameworks, this project demonstrates how to achieve enterprise-grade dual-language architecture while maintaining the performance characteristics required for production game development.
+FirstV8 is a groundbreaking research project that bridges the gap between traditional C++ game engine performance and
+modern JavaScript development workflows. As part of the "First" series of experimental game development frameworks, this
+project demonstrates how to achieve enterprise-grade dual-language architecture while maintaining the performance
+characteristics required for production game development.
 
 ### 🎯 Core Innovation
 
@@ -19,6 +30,7 @@ FirstV8 is a groundbreaking research project that bridges the gap between tradit
 ## ✨ Key Features
 
 ### 🔥 V8 JavaScript Integration
+
 - **Google V8 Engine v13.0.245.25**: Latest JavaScript runtime with optimal performance
 - **Bidirectional Communication**: Seamless C++ ↔ JavaScript interoperability
 - **Chrome DevTools Support**: Professional debugging environment through ChromeDevToolsServer
@@ -26,6 +38,7 @@ FirstV8 is a groundbreaking research project that bridges the gap between tradit
 - **Error Isolation**: JavaScript errors don't crash the C++ engine
 
 ### 🏗️ Engine Architecture
+
 - **Modular Subsystem Design**: Core, Math, Renderer, Audio, Input, Resource, Network, Scripting
 - **Entity-Component System**: Flexible game object architecture with dual-language support
 - **Hot-Reload Development**: FileWatcher and ScriptReloader for rapid iteration
@@ -33,6 +46,7 @@ FirstV8 is a groundbreaking research project that bridges the gap between tradit
 - **Cross-Platform Support**: Windows x64 with comprehensive compatibility
 
 ### 🛠️ Development Experience
+
 - **Visual Studio 2022 Integration**: Complete debugging support for C++ and JavaScript
 - **Academic Documentation**: Research-grade documentation and architectural specifications
 - **Professional Build Pipeline**: Automated V8 runtime deployment and asset management
@@ -41,6 +55,7 @@ FirstV8 is a groundbreaking research project that bridges the gap between tradit
 ## 🏭 Architecture Overview
 
 ### Dual-Language Integration Flow
+
 ```
 Windows Application Entry
 ├── DaemonEngine Foundation
@@ -57,6 +72,7 @@ Windows Application Entry
 ```
 
 ### Runtime Execution Model
+
 ```
 C++ Main Loop:
 ├── BeginFrame()
@@ -139,12 +155,12 @@ FirstV8/
    ```
 
 4. **Restore NuGet Packages:**
-   - Visual Studio will automatically restore V8 packages
-   - Manual restore: `Build → Restore NuGet Packages`
+    - Visual Studio will automatically restore V8 packages
+    - Manual restore: `Build → Restore NuGet Packages`
 
 5. **Build the Solution:**
-   - Select `Debug|x64` or `Release|x64` configuration
-   - `Build → Build Solution` (Ctrl+Shift+B)
+    - Select `Debug|x64` or `Release|x64` configuration
+    - `Build → Build Solution` (Ctrl+Shift+B)
 
 6. **Run the Application:**
    ```bash
@@ -163,7 +179,9 @@ FirstV8/
 ## 🔧 Configuration
 
 ### Game Configuration (`Run/Data/GameConfig.xml`)
+
 ```xml
+
 <GameConfig>
     <WindowClose>false</WindowClose>
     <screenSizeX>1600</screenSizeX>
@@ -176,6 +194,7 @@ FirstV8/
 ```
 
 ### V8 Engine Configuration
+
 - **Chrome DevTools Port**: 9222 (configurable)
 - **JavaScript Runtime**: V8 v13.0.245.25
 - **Memory Management**: Automatic garbage collection with RAII cleanup
@@ -214,36 +233,10 @@ setLightColor(255, 255, 255);
 4. ScriptReloader recompiles and reloads JavaScript
 5. Changes take effect immediately without restart
 
-## 🧪 "First" Series Context
-
-FirstV8 is part of the **"First" series** - a collection of experimental game development projects exploring cutting-edge technologies:
-
-- **FirstV8** (This Project): V8 JavaScript integration with DaemonEngine
-- **FirstVulkan** (Future): Modern Vulkan graphics API exploration
-- **FirstML** (Future): Machine learning integration for game AI
-- **FirstVR** (Future): Virtual reality development frameworks
-
-Each project in the "First" series pushes the boundaries of conventional game development, serving as research vehicles for next-generation game engine architecture and development methodologies.
-
-## 🔬 Research Applications
-
-### Academic Use Cases
-- **Computer Science Education**: Modern game engine architecture patterns
-- **Software Engineering Research**: Dual-language application development
-- **Programming Language Integration**: Performance analysis of C++/JavaScript interop
-- **Real-Time Systems**: Development workflow optimization and hot-reloading
-- **Human-Computer Interaction**: Rapid prototyping methodologies
-
-### Research Contributions
-1. **Novel Dual-Language Integration**: Performance-critical C++ with flexible JavaScript
-2. **Real-Time Hot-Reloading**: Advanced script reloading without application restart
-3. **Chrome DevTools Integration**: Professional JavaScript debugging in game engines
-4. **Academic-Quality Codebase**: Research-grade documentation and architecture
-5. **DaemonEngine Integration**: Proven engine foundation with modern scripting
-
 ## 📦 Dependencies
 
 ### Core Technologies
+
 - **Google V8 JavaScript Engine**: v13.0.245.25 (Apache 2.0 License)
 - **DaemonEngine**: Custom game engine foundation (External submodule)
 - **FMOD Audio Engine**: Professional audio system (Commercial license)
@@ -251,31 +244,9 @@ Each project in the "First" series pushes the boundaries of conventional game de
 - **Microsoft Visual C++ 2022**: C++20 compiler and runtime
 
 ### NuGet Packages
+
 - `v8-v143-x64`: V8 engine headers and libraries
 - `v8.redist-v143-x64`: V8 runtime redistribution files
-
-## 🤝 Contributing
-
-### Development Guidelines
-1. **Follow SOLID Principles**: Maintain clean architecture patterns
-2. **C++20 Standards**: Use modern C++ features with full conformance
-3. **Academic Quality**: Document code for research and educational use
-4. **Dual-Language Thinking**: Consider both C++ performance and JavaScript flexibility
-5. **Professional Standards**: Industry-grade code quality and documentation
-
-### Contribution Process
-1. Fork the repository and create a feature branch
-2. Implement changes following project coding standards
-3. Test in both Debug and Release configurations
-4. Verify JavaScript hot-reloading functionality
-5. Update documentation and academic specifications
-6. Submit pull request with detailed description
-
-## 📄 License
-
-This project is licensed under the **MIT License with Academic Research Clause**.
-
-See the [LICENSE](../LICENSE) file for complete terms. Academic and research use must provide appropriate citation and acknowledgment of the original work.
 
 ## 🔗 Related Projects
 
@@ -284,28 +255,11 @@ See the [LICENSE](../LICENSE) file for complete terms. Academic and research use
 - **Chrome DevTools**: [Developer Tools](https://developer.chrome.com/docs/devtools/)
 - **FMOD**: [Audio Engine](https://www.fmod.com/)
 
-## 🙏 Acknowledgments
-
-- **DaemonEngine Team**: Foundation engine architecture and systems
-- **Google V8 Team**: JavaScript engine technology and Chrome DevTools integration
-- **Firelight Technologies**: FMOD professional audio engine
-- **Microsoft**: Visual Studio development environment and C++20 compiler
-- **Academic Research Community**: Computer science education and research support
-- **Open Source Community**: Inspiration and collaborative development practices
-
 ---
 
 ## 📊 Project Status
 
 - **Version**: 1.0.0-alpha
-- **Development Status**: Active Research Project
+- **Development Status**: Archived
 - **Platforms**: Windows x64
 - **Build Status**: ✅ Passing (Debug/Release)
-- **Documentation**: 📚 Academic Grade
-- **Research Quality**: 🎓 Thesis-Level
-
-**Built with passion for advancing game development research and education** 🎮✨
-
----
-
-*Part of the "First" Series - Exploring the Future of Game Development*
