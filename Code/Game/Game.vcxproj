@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- Game.vcxproj - Application(.exe) Project Configuration -->
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////////// -->
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- PROJECT CONFIGURATIONS -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
     <ItemGroup Label="ProjectConfigurations">
         <ProjectConfiguration Include="Debug|Win32">
             <Configuration>Debug</Configuration>
@@ -18,6 +25,10 @@
             <Platform>x64</Platform>
         </ProjectConfiguration>
     </ItemGroup>
+
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- GLOBAL PROJECT PROPERTIES -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>
         <Keyword>Win32Proj</Keyword>
@@ -27,60 +38,107 @@
         <ProjectName>FirstV8</ProjectName>
     </PropertyGroup>
 
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- V8 PATH CONFIGURATION -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- Centralized V8 package path management for consistent DLL deployment -->
+    <PropertyGroup>
+        <V8LibPath>$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/lib/$(Configuration)/</V8LibPath>
+        <V8RedistLibPath>$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/lib/$(Configuration)/</V8RedistLibPath>
+    </PropertyGroup>
+
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- CONFIGURATION-SPECIFIC PROPERTIES -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Debug Win32 Configuration -->
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="DebugWin32">
+        <ConfigurationType>Application</ConfigurationType>
+        <UseDebugLibraries>true</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <CharacterSet>Unicode</CharacterSet>
+        <LanguageStandard>stdcpp20</LanguageStandard>
+        <ConformanceMode>true</ConformanceMode>
+    </PropertyGroup>
+
+    <!-- Release Win32 Configuration -->
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="ReleaseWin32">
+        <ConfigurationType>Application</ConfigurationType>
+        <UseDebugLibraries>false</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <WholeProgramOptimization>true</WholeProgramOptimization>
+        <CharacterSet>Unicode</CharacterSet>
+        <LanguageStandard>stdcpp20</LanguageStandard>
+        <ConformanceMode>true</ConformanceMode>
+    </PropertyGroup>
+
+    <!-- Debug x64 Configuration -->
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="DebugX64">
+        <ConfigurationType>Application</ConfigurationType>
+        <UseDebugLibraries>true</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <CharacterSet>Unicode</CharacterSet>
+        <LanguageStandard>stdcpp20</LanguageStandard>
+        <ConformanceMode>true</ConformanceMode>
+    </PropertyGroup>
+
+    <!-- Release x64 Configuration -->
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="ReleaseX64">
+        <ConfigurationType>Application</ConfigurationType>
+        <UseDebugLibraries>false</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <WholeProgramOptimization>true</WholeProgramOptimization>
+        <CharacterSet>Unicode</CharacterSet>
+        <LanguageStandard>stdcpp20</LanguageStandard>
+        <ConformanceMode>true</ConformanceMode>
+    </PropertyGroup>
+
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- MSBUILD IMPORTS -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
     <Import Project="$(VCTargetsPath)/Microsoft.Cpp.Default.props"/>
-    <!-- V8 import from Engine -->
+    <Import Project="$(VCTargetsPath)/Microsoft.Cpp.props"/>
+
+    <!-- V8 JavaScript Engine NuGet Package Integration -->
+    <!-- These imports provide V8 path variables for PostBuildEvent DLL deployment -->
     <Import Project="$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/build/native/v8-v143-x64.props"/>
     <Import Project="$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/build/native/v8.redist-v143-x64.props"/>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-        <ConfigurationType>Application</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <PlatformToolset>v143</PlatformToolset>
-        <CharacterSet>Unicode</CharacterSet>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-        <ConfigurationType>Application</ConfigurationType>
-        <UseDebugLibraries>false</UseDebugLibraries>
-        <PlatformToolset>v143</PlatformToolset>
-        <WholeProgramOptimization>true</WholeProgramOptimization>
-        <CharacterSet>Unicode</CharacterSet>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-        <ConfigurationType>Application</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <PlatformToolset>v143</PlatformToolset>
-        <CharacterSet>Unicode</CharacterSet>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-        <ConfigurationType>Application</ConfigurationType>
-        <UseDebugLibraries>false</UseDebugLibraries>
-        <PlatformToolset>v143</PlatformToolset>
-        <WholeProgramOptimization>true</WholeProgramOptimization>
-        <CharacterSet>Unicode</CharacterSet>
-    </PropertyGroup>
-
-    <Import Project="$(VCTargetsPath)/Microsoft.Cpp.props"/>
-
+    <!-- Property Sheets Integration -->
     <ImportGroup Label="ExtensionSettings">
     </ImportGroup>
     <ImportGroup Label="Shared">
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props"
+                Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')"
+                Label="LocalAppDataPlatform"/>
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props"
+                Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')"
+                Label="LocalAppDataPlatform"/>
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props"
+                Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')"
+                Label="LocalAppDataPlatform"/>
     </ImportGroup>
     <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+        <Import Project="$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props"
+                Condition="exists('$(UserRootDir)/Microsoft.Cpp.$(Platform).user.props')"
+                Label="LocalAppDataPlatform"/>
     </ImportGroup>
 
     <PropertyGroup Label="UserMacros"/>
 
-    <!-- Output directly to Temporary folder - PostBuildEvent will copy executable to Run -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- OUTPUT DIRECTORIES AND DEBUGGING CONFIGURATION -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Application builds to Temporary/ then PostBuildEvent deploys to Run/ for execution -->
+
+    <!-- Debug Win32 Configuration -->
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
         <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
         <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
@@ -88,6 +146,8 @@
         <LocalDebuggerCommand>$(TargetFileName)</LocalDebuggerCommand>
         <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
+
+    <!-- Release Win32 Configuration -->
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
         <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
         <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
@@ -95,6 +155,8 @@
         <LocalDebuggerCommand>$(TargetFileName)</LocalDebuggerCommand>
         <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
+
+    <!-- Debug x64 Configuration -->
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
         <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
         <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
@@ -102,6 +164,8 @@
         <LocalDebuggerCommand>$(TargetFileName)</LocalDebuggerCommand>
         <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
+
+    <!-- Release x64 Configuration -->
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
         <OutDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</OutDir>
         <IntDir>$(SolutionDir)Temporary/$(ProjectName)_$(PlatformShortName)_$(Configuration)/</IntDir>
@@ -110,34 +174,93 @@
         <LocalDebuggerWorkingDirectory>$(SolutionDir)Run/</LocalDebuggerWorkingDirectory>
     </PropertyGroup>
 
-    <!-- Simplified ItemDefinitionGroups - V8 props files handle the V8 dependencies -->
-    <!-- Debug Win32 Configuration -->
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- COMPILER AND LINKER SETTINGS -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+    <!-- Debug Win32 Configuration Settings -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="DebugWin32Settings">
+        <ClCompile>
+            <WarningLevel>Level4</WarningLevel>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <LanguageStandard>stdcpp20</LanguageStandard>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20 %(AdditionalOptions)</AdditionalOptions>
+            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(V8LibPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <!-- Windows API libraries required for V8 and game functionality -->
+            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <!-- Complete application deployment: executable + V8 runtime DLLs -->
+        <PostBuildEvent>
+            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run/" &amp; xcopy /Y /F "$(V8RedistLibPath)" "$(SolutionDir)Run/"</Command>
+            <Message>Deploying $(TargetFileName) and V8 Debug runtime to game directory...</Message>
+        </PostBuildEvent>
+    </ItemDefinitionGroup>
+
+    <!-- Release Win32 Configuration Settings -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="ReleaseWin32Settings">
+        <ClCompile>
+            <WarningLevel>Level4</WarningLevel>
+            <FunctionLevelLinking>true</FunctionLevelLinking>
+            <IntrinsicFunctions>true</IntrinsicFunctions>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <LanguageStandard>stdcpp20</LanguageStandard>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20 %(AdditionalOptions)</AdditionalOptions>
+            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <EnableCOMDATFolding>true</EnableCOMDATFolding>
+            <OptimizeReferences>true</OptimizeReferences>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(V8LibPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <!-- Windows API libraries required for V8 and game functionality -->
+            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <!-- Complete application deployment: executable + V8 runtime DLLs -->
+        <PostBuildEvent>
+            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run/" &amp; xcopy /Y /F "$(V8RedistLibPath)" "$(SolutionDir)Run/"</Command>
+            <Message>Deploying $(TargetFileName) and V8 Release runtime to game directory...</Message>
+        </PostBuildEvent>
+    </ItemDefinitionGroup>
+
+    <!-- Debug x64 Configuration Settings -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="DebugX64Settings">
         <ClCompile>
             <WarningLevel>Level4</WarningLevel>
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
-            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20 %(AdditionalOptions)</AdditionalOptions>
+            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-            <!-- V8 dependencies for Win32 Debug -->
+            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(V8LibPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
+        <!-- Complete application deployment: executable + V8 runtime DLLs -->
         <PostBuildEvent>
-            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
-            <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
+            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run/" &amp; xcopy /Y /F "$(V8RedistLibPath)" "$(SolutionDir)Run/"</Command>
+            <Message>Deploying $(TargetFileName) and V8 Debug runtime to game directory...</Message>
         </PostBuildEvent>
     </ItemDefinitionGroup>
 
-    <!-- Release Win32 Configuration -->
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <!-- Release x64 Configuration Settings -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="ReleaseX64Settings">
         <ClCompile>
             <WarningLevel>Level4</WarningLevel>
             <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -146,8 +269,8 @@
             <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
-            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+            <AdditionalOptions>/Zc:__cplusplus /std:c++20 %(AdditionalOptions)</AdditionalOptions>
+            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
         </ClCompile>
         <Link>
@@ -155,121 +278,114 @@
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-            <!-- V8 dependencies for Win32 Release -->
+            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(V8LibPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
             <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
+        <!-- Complete application deployment: executable + V8 runtime DLLs -->
         <PostBuildEvent>
-            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
-            <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
+            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run/" &amp; xcopy /Y /F "$(V8RedistLibPath)" "$(SolutionDir)Run/"</Command>
+            <Message>Deploying $(TargetFileName) and V8 Release runtime to game directory...</Message>
         </PostBuildEvent>
     </ItemDefinitionGroup>
 
-    <!-- Debug x64 Configuration -->
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <ClCompile>
-            <WarningLevel>Level4</WarningLevel>
-            <SDLCheck>true</SDLCheck>
-            <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-            <ConformanceMode>true</ConformanceMode>
-            <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
-            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
-            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-        </ClCompile>
-        <Link>
-            <SubSystem>Windows</SubSystem>
-            <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/lib/Debug/;</AdditionalLibraryDirectories>
-            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-        </Link>
-        <PostBuildEvent>
-            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/lib/Debug/*.dll" "$(SolutionDir)Run/"</Command>
-            <Message>Copying $(TargetFileName) and V8 Debug DLLs to $(SolutionDir)Run...</Message>
-        </PostBuildEvent>
-    </ItemDefinitionGroup>
-
-    <!-- Release x64 Configuration -->
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <ClCompile>
-            <WarningLevel>Level4</WarningLevel>
-            <FunctionLevelLinking>true</FunctionLevelLinking>
-            <IntrinsicFunctions>true</IntrinsicFunctions>
-            <SDLCheck>true</SDLCheck>
-            <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-            <ConformanceMode>true</ConformanceMode>
-            <LanguageStandard>stdcpp20</LanguageStandard>
-            <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
-            <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
-            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-        </ClCompile>
-        <Link>
-            <SubSystem>Windows</SubSystem>
-            <EnableCOMDATFolding>true</EnableCOMDATFolding>
-            <OptimizeReferences>true</OptimizeReferences>
-            <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/;$(SolutionDir)../Engine/Code/ThirdParty/packages/v8-v143-x64.13.0.245.25/lib/Release/;</AdditionalLibraryDirectories>
-            <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-        </Link>
-        <PostBuildEvent>
-            <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run" &amp; xcopy /Y /F "$(SolutionDir)../Engine/Code/ThirdParty/packages/v8.redist-v143-x64.13.0.245.25/lib/Release/*.dll" "$(SolutionDir)Run/"</Command>
-            <Message>Copying $(TargetFileName) and V8 Release DLLs to $(SolutionDir)Run...</Message>
-        </PostBuildEvent>
-    </ItemDefinitionGroup>
-
-    <!-- Project References -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- PROJECT DEPENDENCIES -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- Engine static library provides all core functionality and V8 integration -->
     <ItemGroup>
         <ProjectReference Include="../../../Engine/Code/Engine/Engine.vcxproj">
             <Project>{d80656f3-b024-489f-b7b3-8bf35b25c423}</Project>
         </ProjectReference>
     </ItemGroup>
 
-    <!-- Modern Package References (Alternative to packages.config) -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- GAME SOURCE FILES -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
     <ItemGroup>
-        <PackageReference Include="v8-v143-x64" Version="13.0.245.25">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="v8.redist-v143-x64" Version="13.0.245.25">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-    </ItemGroup>
-
-    <!-- Source Files -->
-    <ItemGroup>
+        <!-- Game Entity System -->
+        <!-- Base entity class providing common game object functionality -->
         <ClCompile Include="Entity.cpp"/>
-        <ClCompile Include="Framework/App.cpp"/>
-        <ClCompile Include="Framework/FileWatcher.cpp"/>
-        <ClCompile Include="Framework/GameCommon.cpp"/>
-        <ClCompile Include="Framework/GameScriptInterface.cpp"/>
-        <ClCompile Include="Framework/Main_Windows.cpp"/>
-        <ClCompile Include="Framework/ScriptReloader.cpp"/>
-        <ClCompile Include="Game.cpp"/>
+        <!-- Player entity with input handling and movement -->
         <ClCompile Include="Player.cpp"/>
+        <!-- Prop entities for static and dynamic world objects -->
         <ClCompile Include="Prop.cpp"/>
+        <!-- Main game logic and state management -->
+        <ClCompile Include="Game.cpp"/>
+
+        <!-- Game Framework Layer -->
+        <!-- Application entry point and main loop coordination -->
+        <ClCompile Include="Framework/App.cpp"/>
+        <!-- File system monitoring for hot-reload functionality -->
+        <ClCompile Include="Framework/FileWatcher.cpp"/>
+        <!-- Common game constants and utility functions -->
+        <ClCompile Include="Framework/GameCommon.cpp"/>
+        <!-- C++ to JavaScript binding interface for game functionality -->
+        <ClCompile Include="Framework/GameScriptInterface.cpp"/>
+        <!-- Windows platform entry point -->
+        <ClCompile Include="Framework/Main_Windows.cpp"/>
+        <!-- Script hot-reloading system for rapid development iteration -->
+        <ClCompile Include="Framework/ScriptReloader.cpp"/>
+
+        <!-- Game Subsystems -->
+        <!-- Lighting subsystem for dynamic scene illumination -->
         <ClCompile Include="Subsystem/Light/LightSubsystem.cpp"/>
     </ItemGroup>
 
-    <!-- Header Files -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- GAME HEADER FILES -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
     <ItemGroup>
+        <!-- Engine Build Configuration -->
+        <!-- Preferences for engine feature compilation -->
         <ClInclude Include="EngineBuildPreferences.hpp"/>
+
+        <!-- Game Entity System Headers -->
+        <!-- Base entity class definition -->
         <ClInclude Include="Entity.hpp"/>
-        <ClInclude Include="Framework/App.hpp"/>
-        <ClInclude Include="Framework/FileWatcher.hpp"/>
-        <ClInclude Include="Framework/GameCommon.hpp"/>
-        <ClInclude Include="Framework/GameScriptInterface.hpp"/>
-        <ClInclude Include="Framework/ScriptReloader.hpp"/>
-        <ClInclude Include="Game.hpp"/>
+        <!-- Player entity class with game-specific functionality -->
         <ClInclude Include="Player.hpp"/>
+        <!-- Prop entity class for world objects -->
         <ClInclude Include="Prop.hpp"/>
+        <!-- Main game class managing overall game state -->
+        <ClInclude Include="Game.hpp"/>
+
+        <!-- Game Framework Layer Headers -->
+        <!-- Application class coordinating engine and game systems -->
+        <ClInclude Include="Framework/App.hpp"/>
+        <!-- File monitoring for script hot-reload capability -->
+        <ClInclude Include="Framework/FileWatcher.hpp"/>
+        <!-- Game-wide constants and common functionality -->
+        <ClInclude Include="Framework/GameCommon.hpp"/>
+        <!-- JavaScript integration interface exposing game functions to scripts -->
+        <ClInclude Include="Framework/GameScriptInterface.hpp"/>
+        <!-- Script reloading system for development workflow -->
+        <ClInclude Include="Framework/ScriptReloader.hpp"/>
+
+        <!-- Game Subsystems Headers -->
+        <!-- Lighting subsystem for scene illumination management -->
         <ClInclude Include="Subsystem/Light/LightSubsystem.hpp"/>
     </ItemGroup>
 
-    <!-- Other Files -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- DOCUMENTATION AND PROJECT FILES -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
     <ItemGroup>
+        <!-- Project documentation and development notes -->
         <None Include="../../Docs/README.md"/>
     </ItemGroup>
 
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <!-- MSBUILD TARGETS AND BUILD VALIDATION -->
+    <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
     <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">
     </ImportGroup>
+
+    <!-- Custom Build Information Target -->
+    <Target Name="ShowBuildInfo" BeforeTargets="Build">
+        <Message Text="Building FirstV8 Game Application - Configuration: $(Configuration), Platform: $(Platform)" Importance="high"/>
+        <Message Text="Output: $(TargetPath)" Importance="normal"/>
+        <Message Text="Working Directory: $(LocalDebuggerWorkingDirectory)" Importance="normal"/>
+        <Message Text="V8 Runtime will be deployed from: $(V8RedistLibPath)" Importance="normal"/>
+    </Target>
 </Project>
