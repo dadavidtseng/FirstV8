@@ -21,8 +21,8 @@ ProtogameJS projects.
 
 ### 🔗 Related Projects
 
-- **ProtogameJS2D** *(Coming Soon)*: 2D game framework based on FirstV8 patterns
-- **ProtogameJS3D** *(Coming Soon)*: 3D game framework evolved from FirstV8 architecture
+- **[ProtogameJS2D](https://github.com/dadavidtseng/ProtogameJS2D)** : 2D game framework based on FirstV8 patterns
+- **[ProtogameJS3D](https://github.com/dadavidtseng/ProtogameJS3D)** : 3D game framework evolved from FirstV8 architecture
 
 ---
 
