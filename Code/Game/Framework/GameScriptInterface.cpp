@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------------------------
 // GameScriptInterface.cpp
-// Game 類別的腳本介面包裝器實作
+// Script interface wrapper implementation for the Game class
 //----------------------------------------------------------------------------------------------------
 
 #include "Game/Framework/GameScriptInterface.hpp"
@@ -50,22 +50,22 @@ std::vector<ScriptMethodInfo> GameScriptInterface::GetAvailableMethods() const
 {
     return {
         ScriptMethodInfo("createCube",
-                         "在指定位置創建一個立方體",
+                         "Create a cube at the specified position",
                          {"float", "float", "float"},
                          "string"),
 
         ScriptMethodInfo("moveProp",
-                         "移動指定索引的道具到新位置",
+                         "Move the prop at the specified index to a new position",
                          {"int", "float", "float", "float"},
                          "string"),
 
         ScriptMethodInfo("getPlayerPosition",
-                         "取得玩家目前位置",
+                         "Get the player's current position",
                          {},
                          "object"),
 
         ScriptMethodInfo("movePlayerCamera",
-                         "移動玩家相機（用於晃動效果）",
+                         "Move the player camera (for shake effects)",
                          {"float", "float", "float"},
                          "string"),
 
@@ -79,63 +79,63 @@ std::vector<ScriptMethodInfo> GameScriptInterface::GetAvailableMethods() const
                          "void"),
 
         ScriptMethodInfo("executeCommand",
-                         "執行 JavaScript 指令",
+                         "Execute JavaScript command",
                          {"string"},
                          "string"),
 
         ScriptMethodInfo("executeFile",
-                         "執行 JavaScript 檔案",
+                         "Execute JavaScript file",
                          {"string"},
                          "string"),
 
         ScriptMethodInfo("isAttractMode",
-                         "檢查遊戲是否處於吸引模式",
+                         "Check if the game is in attract mode",
                          {},
                          "bool"),
 
         ScriptMethodInfo("getGameState",
-                         "取得目前遊戲狀態",
+                         "Get the current game state",
                          {},
                          "string"),
 
         ScriptMethodInfo("getFileTimestamp",
-                         "取得檔案的最後修改時間戳記",
+                         "Get the last modified timestamp of a file",
                          {"string"},
                          "number"),
 
         // Hot-reload system methods
         ScriptMethodInfo("enableHotReload",
-                         "啟用熱重載系統",
+                         "Enable hot reload system",
                          {},
                          "bool"),
 
         ScriptMethodInfo("disableHotReload",
-                         "停用熱重載系統",
+                         "Disable hot reload system",
                          {},
                          "bool"),
 
         ScriptMethodInfo("isHotReloadEnabled",
-                         "檢查熱重載系統是否啟用",
+                         "Check if hot reload system is enabled",
                          {},
                          "bool"),
 
         ScriptMethodInfo("addWatchedFile",
-                         "新增要監控的檔案",
+                         "Add file to monitor",
                          {"string"},
                          "bool"),
 
         ScriptMethodInfo("removeWatchedFile",
-                         "移除監控的檔案",
+                         "Remove monitored file",
                          {"string"},
                          "bool"),
 
         ScriptMethodInfo("getWatchedFiles",
-                         "取得目前監控的檔案清單",
+                         "Get list of currently monitored files",
                          {},
                          "string"),
 
         ScriptMethodInfo("reloadScript",
-                         "手動重載指定的腳本檔案",
+                         "Manually reload specified script file",
                          {"string"},
                          "bool")
     };
@@ -229,11 +229,11 @@ ScriptMethodResult GameScriptInterface::CallMethod(std::string const&           
             return ExecuteReloadScript(args);
         }
 
-        return ScriptMethodResult::Error("未知的方法: " + methodName);
+        return ScriptMethodResult::Error("Unknown method: " + methodName);
     }
     catch (std::exception const& e)
     {
-        return ScriptMethodResult::Error("方法執行時發生例外: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Exception occurred during method execution: " + std::string(e.what()));
     }
 }
 
@@ -255,8 +255,8 @@ std::any GameScriptInterface::GetProperty(const std::string& propertyName) const
 //----------------------------------------------------------------------------------------------------
 bool GameScriptInterface::SetProperty(const std::string& propertyName, const std::any& value)
 {
-    // 目前 Game 物件沒有可設定的屬性
-    // 如果需要，可以在這裡添加
+    // Currently the Game object has no settable properties
+    // Can be added here if needed
     UNUSED(propertyName);
     UNUSED(value);
     return false;
@@ -272,14 +272,14 @@ ScriptMethodResult GameScriptInterface::ExecuteCreateCube(const std::vector<std:
     {
         Vec3 position = ExtractVec3(args, 0);
         m_game->CreateCube(position);
-        return ScriptMethodResult::Success(std::string("立方體創建成功，位置: (" +
+        return ScriptMethodResult::Success(std::string("Cube created successfully, position: (" +
             std::to_string(position.x) + ", " +
             std::to_string(position.y) + ", " +
             std::to_string(position.z) + ")"));
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("創建立方體失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to create cube: " + std::string(e.what()));
     }
 }
 
@@ -294,15 +294,15 @@ ScriptMethodResult GameScriptInterface::ExecuteMoveProp(const std::vector<std::a
         int  propIndex   = ExtractInt(args[0]);
         Vec3 newPosition = ExtractVec3(args, 1);
         m_game->MoveProp(propIndex, newPosition);
-        return ScriptMethodResult::Success(std::string("道具 " + std::to_string(propIndex) +
-            " 移動成功，新位置: (" +
+        return ScriptMethodResult::Success(std::string("Prop " + std::to_string(propIndex) +
+            " moved successfully, new position: (" +
             std::to_string(newPosition.x) + ", " +
             std::to_string(newPosition.y) + ", " +
             std::to_string(newPosition.z) + ")"));
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("移動道具失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to move prop: " + std::string(e.what()));
     }
 }
 
@@ -317,13 +317,13 @@ ScriptMethodResult GameScriptInterface::ExecuteGetPlayerPosition(const std::vect
         Player* player = m_game->GetPlayer();
         if (!player)
         {
-            return ScriptMethodResult::Error("玩家物件不存在");
+            return ScriptMethodResult::Error("Player object does not exist");
         }
 
         Vec3 position = player->m_position;
 
 
-        // 回傳一個可以被 JavaScript 使用的物件
+        // Return an object that can be used by JavaScript
         std::string positionStr = "{ x: " + std::to_string(position.x) +
         ", y: " + std::to_string(position.y) +
         ", z: " + std::to_string(position.z) + " }";
@@ -332,7 +332,7 @@ ScriptMethodResult GameScriptInterface::ExecuteGetPlayerPosition(const std::vect
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("取得玩家位置失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to get player position: " + std::string(e.what()));
     }
 }
 
@@ -346,14 +346,14 @@ ScriptMethodResult GameScriptInterface::ExecuteMovePlayerCamera(const std::vecto
     {
         Vec3 offset = ExtractVec3(args, 0);
         m_game->MovePlayerCamera(offset);
-        return ScriptMethodResult::Success(std::string("相機位置已移動: (" +
+        return ScriptMethodResult::Success(std::string("Camera position moved: (" +
             std::to_string(offset.x) + ", " +
             std::to_string(offset.y) + ", " +
             std::to_string(offset.z) + ")"));
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("移動玩家相機失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to move player camera: " + std::string(e.what()));
     }
 }
 
@@ -406,11 +406,11 @@ ScriptMethodResult GameScriptInterface::ExecuteJavaScriptCommand(const std::vect
     {
         std::string command = ExtractString(args[0]);
         m_game->ExecuteJavaScriptCommand(command);
-        return ScriptMethodResult::Success(std::string("指令執行: " + command));
+        return ScriptMethodResult::Success(std::string("Command executed: " + command));
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("執行 JavaScript 指令失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to execute JavaScript command: " + std::string(e.what()));
     }
 }
 
@@ -424,11 +424,11 @@ ScriptMethodResult GameScriptInterface::ExecuteJavaScriptFile(const std::vector<
     {
         std::string filename = ExtractString(args[0]);
         m_game->ExecuteJavaScriptFile(filename);
-        return ScriptMethodResult::Success(std::string("檔案執行: " + filename));
+        return ScriptMethodResult::Success(std::string("File executed: " + filename));
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("執行 JavaScript 檔案失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to execute JavaScript file: " + std::string(e.what()));
     }
 }
 
@@ -445,7 +445,7 @@ ScriptMethodResult GameScriptInterface::ExecuteIsAttractMode(const std::vector<s
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("檢查吸引模式失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to check attract mode: " + std::string(e.what()));
     }
 }
 
@@ -462,12 +462,12 @@ ScriptMethodResult GameScriptInterface::ExecuteGetGameState(const std::vector<st
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("取得遊戲狀態失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to get game state: " + std::string(e.what()));
     }
 }
 
 //----------------------------------------------------------------------------------------------------
-// 輔助方法實作
+// Helper method implementations
 //----------------------------------------------------------------------------------------------------
 
 template <typename T>
@@ -480,7 +480,7 @@ T GameScriptInterface::ExtractArg(const std::any& arg, const std::string& expect
     catch (const std::bad_any_cast& e)
     {
         std::string typeInfo = expectedType.empty() ? typeid(T).name() : expectedType;
-        throw std::invalid_argument("參數類型錯誤，期望: " + typeInfo);
+        throw std::invalid_argument("Parameter type error, expected: " + typeInfo);
     }
 }
 
@@ -489,7 +489,7 @@ Vec3 GameScriptInterface::ExtractVec3(const std::vector<std::any>& args, size_t 
 {
     if (startIndex + 2 >= args.size())
     {
-        throw std::invalid_argument("Vec3 需要 3 個參數 (x, y, z)");
+        throw std::invalid_argument("Vec3 requires 3 parameters (x, y, z)");
     }
 
     float x = ExtractFloat(args[startIndex]);
@@ -502,7 +502,7 @@ Vec3 GameScriptInterface::ExtractVec3(const std::vector<std::any>& args, size_t 
 //----------------------------------------------------------------------------------------------------
 float GameScriptInterface::ExtractFloat(const std::any& arg) const
 {
-    // 嘗試多種數值類型的轉換
+    // Try multiple numeric type conversions
     try
     {
         return std::any_cast<float>(arg);
@@ -521,7 +521,7 @@ float GameScriptInterface::ExtractFloat(const std::any& arg) const
             }
             catch (const std::bad_any_cast&)
             {
-                throw std::invalid_argument("無法轉換為 float 類型");
+                throw std::invalid_argument("Unable to convert to float type");
             }
         }
     }
@@ -548,7 +548,7 @@ int GameScriptInterface::ExtractInt(const std::any& arg) const
             }
             catch (const std::bad_any_cast&)
             {
-                throw std::invalid_argument("無法轉換為 int 類型");
+                throw std::invalid_argument("Unable to convert to int type");
             }
         }
     }
@@ -570,7 +570,7 @@ std::string GameScriptInterface::ExtractString(const std::any& arg) const
         }
         catch (const std::bad_any_cast&)
         {
-            throw std::invalid_argument("無法轉換為 string 類型");
+            throw std::invalid_argument("Unable to convert to string type");
         }
     }
 }
@@ -586,13 +586,13 @@ bool GameScriptInterface::ExtractBool(const std::any& arg) const
     {
         try
         {
-            // 嘗試從數值轉換
+            // Try conversion from numeric value
             int val = std::any_cast<int>(arg);
             return val != 0;
         }
         catch (const std::bad_any_cast&)
         {
-            throw std::invalid_argument("無法轉換為 bool 類型");
+            throw std::invalid_argument("Unable to convert to bool type");
         }
     }
 }
@@ -657,12 +657,12 @@ ScriptMethodResult GameScriptInterface::ExecuteGetFileTimestamp(const std::vecto
         }
         else
         {
-            return ScriptMethodResult::Error("檔案不存在: " + filePath);
+            return ScriptMethodResult::Error("File does not exist: " + filePath);
         }
     }
     catch (const std::exception& e)
     {
-        return ScriptMethodResult::Error("取得檔案時間戳記失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to get file timestamp: " + std::string(e.what()));
     }
 }
 
@@ -809,7 +809,7 @@ ScriptMethodResult GameScriptInterface::ExecuteEnableHotReload(const std::vector
     
     try {
         if (!m_fileWatcher || !m_scriptReloader) {
-            return ScriptMethodResult::Error("熱重載系統未初始化");
+            return ScriptMethodResult::Error("Hot reload system not initialized");
         }
         
         if (!m_hotReloadEnabled) {
@@ -820,7 +820,7 @@ ScriptMethodResult GameScriptInterface::ExecuteEnableHotReload(const std::vector
         return ScriptMethodResult::Success(true);
     }
     catch (const std::exception& e) {
-        return ScriptMethodResult::Error("啟用熱重載失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to enable hot reload: " + std::string(e.what()));
     }
 }
 
@@ -838,7 +838,7 @@ ScriptMethodResult GameScriptInterface::ExecuteDisableHotReload(const std::vecto
         return ScriptMethodResult::Success(true);
     }
     catch (const std::exception& e) {
-        return ScriptMethodResult::Error("停用熱重載失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to disable hot reload: " + std::string(e.what()));
     }
 }
 
@@ -859,14 +859,14 @@ ScriptMethodResult GameScriptInterface::ExecuteAddWatchedFile(const std::vector<
         std::string filePath = ExtractString(args[0]);
         
         if (!m_fileWatcher) {
-            return ScriptMethodResult::Error("FileWatcher 未初始化");
+            return ScriptMethodResult::Error("FileWatcher not initialized");
         }
         
         m_fileWatcher->AddWatchedFile(filePath);
         return ScriptMethodResult::Success(true);
     }
     catch (const std::exception& e) {
-        return ScriptMethodResult::Error("新增監控檔案失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to add monitored file: " + std::string(e.what()));
     }
 }
 
@@ -879,14 +879,14 @@ ScriptMethodResult GameScriptInterface::ExecuteRemoveWatchedFile(const std::vect
         std::string filePath = ExtractString(args[0]);
         
         if (!m_fileWatcher) {
-            return ScriptMethodResult::Error("FileWatcher 未初始化");
+            return ScriptMethodResult::Error("FileWatcher not initialized");
         }
         
         m_fileWatcher->RemoveWatchedFile(filePath);
         return ScriptMethodResult::Success(true);
     }
     catch (const std::exception& e) {
-        return ScriptMethodResult::Error("移除監控檔案失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to remove monitored file: " + std::string(e.what()));
     }
 }
 
@@ -897,7 +897,7 @@ ScriptMethodResult GameScriptInterface::ExecuteGetWatchedFiles(const std::vector
     
     try {
         if (!m_fileWatcher) {
-            return ScriptMethodResult::Error("FileWatcher 未初始化");
+            return ScriptMethodResult::Error("FileWatcher not initialized");
         }
         
         auto watchedFiles = m_fileWatcher->GetWatchedFiles();
@@ -912,7 +912,7 @@ ScriptMethodResult GameScriptInterface::ExecuteGetWatchedFiles(const std::vector
         return ScriptMethodResult::Success(fileList);
     }
     catch (const std::exception& e) {
-        return ScriptMethodResult::Error("取得監控檔案清單失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to get monitored file list: " + std::string(e.what()));
     }
 }
 
@@ -925,13 +925,13 @@ ScriptMethodResult GameScriptInterface::ExecuteReloadScript(const std::vector<st
         std::string scriptPath = ExtractString(args[0]);
         
         if (!m_scriptReloader) {
-            return ScriptMethodResult::Error("ScriptReloader 未初始化");
+            return ScriptMethodResult::Error("ScriptReloader not initialized");
         }
         
         bool success = m_scriptReloader->ReloadScript(scriptPath);
         return ScriptMethodResult::Success(success);
     }
     catch (const std::exception& e) {
-        return ScriptMethodResult::Error("重載腳本失敗: " + std::string(e.what()));
+        return ScriptMethodResult::Error("Failed to reload script: " + std::string(e.what()));
     }
 }

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------------------------------
-// Game.hpp - 整合 V8Subsystem 後的版本
+// Game.hpp - Version after V8Subsystem integration
 //----------------------------------------------------------------------------------------------------
 
 #pragma once
@@ -39,7 +39,7 @@ public:
     void Render();
     bool IsAttractMode() const;
 
-    // 新增：JavaScript 相關功能
+    // Added: JavaScript related functionality
     void ExecuteJavaScriptCommand(String const& command);
     void ExecuteJavaScriptFile(String const& filename);
     void HandleJavaScriptCommands();
@@ -48,7 +48,7 @@ public:
     void ExecuteJavaScriptCommandForDebug(const std::string& command, const std::string& scriptName);
     void ExecuteJavaScriptFileForDebug(const std::string& filename);
 
-    // 新增：JavaScript 回呼函數需要的遊戲功能
+    // Added: Game functionality required for JavaScript callback functions
     void    CreateCube(Vec3 const& position);
     void    MoveProp(int propIndex, Vec3 const& newPosition);
     void    MovePlayerCamera(Vec3 const& offset);
@@ -56,7 +56,7 @@ public:
     void    Update(float gameDeltaSeconds, float systemDeltaSeconds);
     void    Render(float gameDeltaSeconds, float systemDeltaSeconds);
 
-    // 新增：控制台命令處理
+    // Added: Console command handling
     void   HandleConsoleCommands();
     Clock* m_gameClock = nullptr;
 
@@ -83,13 +83,13 @@ private:
 
     eGameState m_gameState = eGameState::ATTRACT;
 
-    // 新增：物件管理
-    std::vector<Prop*> m_props;  // 用於 JavaScript 管理的物件清單
+    // Added: Object management
+    std::vector<Prop*> m_props;  // Object list for JavaScript management
 
-    // 新增：JavaScript 狀態
+    // Added: JavaScript state
     bool m_hasInitializedJS = false;
     bool m_hasRunJSTests    = false;
 
-    Vec3 m_originalPlayerPosition = Vec3(-2.f, 0.f, 1.f);  // 儲存原始位置
-    bool m_cameraShakeActive      = false;                        // 追蹤震動狀態
+    Vec3 m_originalPlayerPosition = Vec3(-2.f, 0.f, 1.f);  // Store original position
+    bool m_cameraShakeActive      = false;                        // Track shake status
 };

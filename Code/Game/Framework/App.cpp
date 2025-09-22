@@ -117,21 +117,21 @@ void App::Startup()
     //-Start-of-LogSubsystem--------------------------------------------------------------------------
 
     sLogSubsystemConfig config;
-    config.logFilePath      = "Logs/FirstV8.log";        // 日誌檔案路徑
-    config.enableConsole    = true;                   // 啟用控制台輸出
-    config.enableFile       = true;                      // 啟用檔案輸出
-    config.enableDebugOut   = true;                  // 啟用 Visual Studio 輸出
-    config.enableOnScreen   = true;                  // 啟用螢幕輸出
-    config.enableDevConsole = true;                // 啟用開發者控制台輸出
-    config.asyncLogging     = true;                    // 啟用非同步日誌
-    config.maxLogEntries    = 50000;                  // 記憶體中最大日誌條目數
-    config.timestampEnabled = true;               // 啟用時間戳記
-    config.threadIdEnabled  = true;                 // 啟用執行緒 ID
-    config.autoFlush        = false;                      // 不自動重新整理（效能考量）
+    config.logFilePath      = "Logs/FirstV8.log";        // Log file path
+    config.enableConsole    = true;                   // Enable console output
+    config.enableFile       = true;                      // Enable file output
+    config.enableDebugOut   = true;                  // Enable Visual Studio output
+    config.enableOnScreen   = true;                  // Enable screen output
+    config.enableDevConsole = true;                // Enable developer console output
+    config.asyncLogging     = true;                    // Enable asynchronous logging
+    config.maxLogEntries    = 50000;                  // Maximum log entries in memory
+    config.timestampEnabled = true;               // Enable timestamp
+    config.threadIdEnabled  = true;                 // Enable thread ID
+    config.autoFlush        = false;                      // No auto flush (performance consideration)
 
     // Enhanced smart rotation settings
-    config.enableSmartRotation = true;               // 啟用智能日誌輪轉 (Minecraft-style)
-    config.rotationConfigPath  = "Data/Config/LogRotation.json"; // 輪轉配置檔案路徑
+    config.enableSmartRotation = true;               // Enable smart log rotation (Minecraft-style)
+    config.rotationConfigPath  = "Data/Config/LogRotation.json"; // Rotation config file path
 
     // Configure Minecraft-style rotation settings
     config.smartRotationConfig.maxFileSizeBytes = 100 * 1024 * 1024;  // 100MB per file
@@ -201,7 +201,7 @@ void App::Startup()
 //
 void App::Shutdown()
 {
-    // 在其他清理程式碼之前新增：
+    // Added before other cleanup code:
     if (m_gameScriptInterface)
     {
         if (g_v8Subsystem)
@@ -348,7 +348,7 @@ STATIC std::any App::OnPrint(std::vector<std::any> const& args)
         }
         catch (std::bad_any_cast const&)
         {
-            DebuggerPrintf("JS: [無法轉換的物件]\n");
+            DebuggerPrintf("JS: [Unable to convert object]\n");
         }
     }
     return std::any{};
@@ -365,7 +365,7 @@ std::any App::OnDebug(std::vector<std::any> const& args)
         }
         catch (std::bad_any_cast const&)
         {
-            DebuggerPrintf("JS DEBUG: [無法轉換的物件]\n");
+            DebuggerPrintf("JS DEBUG: [Unable to convert object]\n");
         }
     }
     return std::any{};
@@ -377,7 +377,7 @@ std::any App::OnGarbageCollection(std::vector<std::any> const& args)
     if (g_v8Subsystem)
     {
         g_v8Subsystem->ForceGarbageCollection();
-        DebuggerPrintf("JS: 垃圾回收已執行\n");
+        DebuggerPrintf("JS: Garbage collection executed\n");
     }
     return std::any{};
 }

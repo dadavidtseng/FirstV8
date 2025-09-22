@@ -18,8 +18,8 @@ class V8Subsystem;
 struct Vec3;
 
 //----------------------------------------------------------------------------------------------------
-// Game 類別的腳本介面包裝器
-// 這個類別作為 Game 物件與 V8Subsystem 之間的橋樑
+// Script interface wrapper for the Game class
+// This class serves as a bridge between the Game object and V8Subsystem
 //----------------------------------------------------------------------------------------------------
 class GameScriptInterface : public IScriptableObject
 {
@@ -27,12 +27,12 @@ public:
     explicit GameScriptInterface(Game* game);
     ~GameScriptInterface();
 
-    // 實作 IScriptableObject 介面
+    // Implement IScriptableObject interface
     std::string                   GetScriptObjectName() const override;
     std::vector<ScriptMethodInfo> GetAvailableMethods() const override;
     ScriptMethodResult            CallMethod(std::string const& methodName, std::vector<std::any> const& args) override;
 
-    // 實作屬性存取
+    // Implement property access
     std::any                 GetProperty(const std::string& propertyName) const override;
     bool                     SetProperty(const std::string& propertyName, const std::any& value) override;
     std::vector<std::string> GetAvailableProperties() const override;
@@ -45,7 +45,7 @@ public:
     void ProcessPendingHotReloadEvents();
 
 private:
-    Game* m_game; // 不擁有，只是參考
+    Game* m_game; // Not owned, just a reference
 
     // Hot-reload system components
     std::unique_ptr<FileWatcher> m_fileWatcher;
@@ -64,18 +64,18 @@ private:
     // Helper method to construct absolute paths (same logic as FileWatcher)
     std::string GetAbsoluteScriptPath(const std::string& relativePath) const;
 
-    // 輔助方法來處理類型轉換和錯誤檢查
+    // Helper methods to handle type conversion and error checking
     template <typename T>
     T ExtractArg(const std::any& arg, const std::string& expectedType = "") const;
 
-    // 專門的類型提取方法
+    // Specialized type extraction methods
     Vec3        ExtractVec3(const std::vector<std::any>& args, size_t startIndex) const;
     float       ExtractFloat(const std::any& arg) const;
     int         ExtractInt(const std::any& arg) const;
     std::string ExtractString(const std::any& arg) const;
     bool        ExtractBool(const std::any& arg) const;
 
-    // 參數驗證輔助方法
+    // Parameter validation helper methods
     ScriptMethodResult ValidateArgCount(const std::vector<std::any>& args,
                                         size_t                       expectedCount,
                                         const std::string&           methodName) const;
@@ -85,7 +85,7 @@ private:
                                              size_t                       maxCount,
                                              const std::string&           methodName) const;
 
-    // 方法實作
+    // Method implementations
     ScriptMethodResult ExecuteCreateCube(const std::vector<std::any>& args);
     ScriptMethodResult ExecuteMoveProp(const std::vector<std::any>& args);
     ScriptMethodResult ExecuteGetPlayerPosition(const std::vector<std::any>& args);

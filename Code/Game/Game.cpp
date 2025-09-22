@@ -303,13 +303,13 @@ void Game::UpdateFromController()
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateEntities(float const gameDeltaSeconds, float const systemDeltaSeconds) const
 {
-    // 更新玩家
+    // Update player
     if (m_player)
     {
         m_player->Update(gameDeltaSeconds);
     }
 
-    // 更新所有物件
+    // Update all objects
     for (Prop* prop : m_props)
     {
         if (prop)
@@ -581,13 +581,13 @@ void Game::ExecuteJavaScriptFile(String const& filename)
 //----------------------------------------------------------------------------------------------------
 void Game::HandleJavaScriptCommands()
 {
-    // 處理動態 JavaScript 指令（例如從網路、檔案或其他來源）
-    // 這裡可以加入定期檢查 JavaScript 指令的邏輯
+    // Handle dynamic JavaScript commands (e.g. from network, files or other sources)
+    // Logic for periodically checking JavaScript commands can be added here
 
-    // 範例：檢查特定按鍵來執行預設腳本
+    // Example: Check specific key to execute default script
     if (g_input->WasKeyJustPressed('J'))
     {
-        // ExecuteJavaScriptCommand("console.log('J 鍵觸發的 JavaScript!');");
+        // ExecuteJavaScriptCommand("console.log('J key triggered JavaScript!');");
         ExecuteJavaScriptFile("Data/Scripts/test_scripts.js");
     }
 
@@ -601,7 +601,7 @@ void Game::HandleJavaScriptCommands()
     {
         // ExecuteJavaScriptCommand("var pos = game.getPlayerPosition(); console.log('Player Position:', pos);");
         ExecuteJavaScriptCommand("debug('Player Position');");
-        // ExecuteJavaScriptCommand("console.log('這是真的 JavaScript 輸出！'); 42;");
+        // ExecuteJavaScriptCommand("console.log('This is real JavaScript output!'); 42;");
     }
 
     // SCRIPT REGISTRY: F2 Key - Register for Chrome DevTools debugging  
@@ -648,7 +648,7 @@ void Game::MoveProp(int         propIndex,
     }
     else
     {
-        DebuggerPrintf("警告：JavaScript 請求移動無效的物件索引 %d（總共 %zu 個物件）\n", propIndex, m_props.size());
+        DebuggerPrintf("Warning: JavaScript requested to move invalid object index %d (total %zu objects)\n", propIndex, m_props.size());
     }
 }
 
@@ -693,7 +693,7 @@ void Game::Render(float gameDeltaSeconds, float systemDeltaSeconds)
         DebugAddScreenText(Stringf("ClientDimensions=(%.1f,%.1f)", clientDimensions.x, clientDimensions.y), Vec2(0, 40), 20.f, Vec2::ZERO, 0.f);
         DebugAddScreenText(Stringf("WindowPosition=(%.1f,%.1f)", windowPosition.x, windowPosition.y), Vec2(0, 60), 20.f, Vec2::ZERO, 0.f);
         DebugAddScreenText(Stringf("ClientPosition=(%.1f,%.1f)", clientPosition.x, clientPosition.y), Vec2(0, 80), 20.f, Vec2::ZERO, 0.f);
-        // 新增：JavaScript 狀態顯示
+        // Added: JavaScript status display
         if (g_v8Subsystem)
         {
             std::string jsStatus = g_v8Subsystem->IsInitialized() ? "JS:Initialized" : "JS:UnInitialized";
@@ -701,7 +701,7 @@ void Game::Render(float gameDeltaSeconds, float systemDeltaSeconds)
 
             if (g_v8Subsystem->HasError())
             {
-                DebugAddScreenText("JS錯誤: " + g_v8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
+                DebugAddScreenText("JS Error: " + g_v8Subsystem->GetLastError(), Vec2(0, 120), 15.f, Vec2::ZERO, 0.f, Rgba8::RED);
             }
         }
     }
@@ -742,11 +742,11 @@ void Game::MovePlayerCamera(Vec3 const& offset)
         {
             m_originalPlayerPosition = m_player->m_position;
             m_cameraShakeActive      = true;
-            DebuggerPrintf("開始相機震動，原始位置: (%.3f, %.3f, %.3f)\n",
+            DebuggerPrintf("Starting camera shake, original position: (%.3f, %.3f, %.3f)\n",
                            m_originalPlayerPosition.x, m_originalPlayerPosition.y, m_originalPlayerPosition.z);
         }
 
-        // 基於原始位置計算新位置（而不是當前位置）
+        // Calculate new position based on original position (not current position)
         Vec3 newPosition     = m_originalPlayerPosition + offset;
         m_player->m_position = newPosition;
     }
@@ -755,15 +755,15 @@ void Game::MovePlayerCamera(Vec3 const& offset)
 //----------------------------------------------------------------------------------------------------
 void Game::HandleConsoleCommands()
 {
-    // 處理開發者控制台的 JavaScript 指令
-    // 這需要與 DevConsole 整合
+    // Handle JavaScript commands from developer console
+    // This needs to be integrated with DevConsole
 
     if (g_devConsole && g_devConsole->IsOpen())
     {
-        // 檢查控制台輸入是否為 JavaScript 指令
-        // 這裡需要實作具體的控制台輸入檢查邏輯
+        // Check if console input is a JavaScript command
+        // Specific console input checking logic needs to be implemented here
 
-        // 範例實作（需要 DevConsole 支援）:
+        // Example implementation (requires DevConsole support):
         /*
         std::string input = g_theConsole->GetLastInput();
         if (input.substr(0, 3) == "js:")
